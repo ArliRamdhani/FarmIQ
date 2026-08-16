@@ -28,17 +28,22 @@ FarmIQ/
 ├── PROJECT_RULES.md      # Standar dan aturan pengembangan proyek
 ├── README.md             # Dokumentasi lengkap proyek
 ├── package.json          # Dependensi & build scripts
-├── data/                 # Penyimpanan SQLite Database (diabaikan git)
-│   └── farmiq.db
+├── data/                 # Penyimpanan Data Feedback (diabaikan git)
+│   └── feedbacks.json
 ├── src/
 │   ├── server.ts         # Server Express, routing, keamanan & integrasi Gemini API
-│   └── db.ts             # Layanan database SQLite untuk feedback pengguna
+│   └── db.ts             # Data store layer atomic persistent & in-memory cache
 └── public/
     ├── index.html        # Frontend dashboard antarmuka pengguna FarmIQ
     ├── admin.html        # Portal admin pengelola feedback pengguna
-    ├── logo.png          # Logo resmi resolusi tinggi
-    ├── favicon.png       # Favicon PNG
-    └── favicon.ico       # Favicon browser multi-resolusi
+    ├── favicon.ico       # Favicon browser multi-resolusi
+    └── assets/
+        └── images/       # Folder aset visual & logo
+            ├── logo-full.png # Logo horizontal lengkap (Emblem, Nama, Slogan)
+            ├── logo.png      # Logo emblem persegi
+            ├── app-name.png  # Tipografi nama & slogan FarmIQ
+            ├── favicon.png   # Favicon PNG
+            └── favicon.ico   # Favicon ICO
 ```
 
 ## API Endpoint Blueprint

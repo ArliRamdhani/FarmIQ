@@ -56,9 +56,14 @@ FarmIQ/
 ├── public/
 │   ├── index.html        # Frontend dashboard antarmuka pengguna FarmIQ
 │   ├── admin.html        # Portal admin pengelola feedback pengguna
-│   ├── logo.png          # Logo resmi resolusi tinggi
-│   ├── favicon.png       # Favicon PNG
-│   └── favicon.ico       # Favicon browser multi-resolusi
+│   ├── favicon.ico       # Favicon browser multi-resolusi
+│   └── assets/
+│       └── images/       # Folder aset visual & logo
+│           ├── logo-full.png # Logo horizontal lengkap (Emblem, Nama, Slogan)
+│           ├── logo.png      # Logo emblem persegi
+│           ├── app-name.png  # Tipografi nama & slogan FarmIQ
+│           ├── favicon.png   # Favicon PNG
+│           └── favicon.ico   # Favicon ICO
 └── dist/                 # Hasil build JavaScript untuk produksi
 ```
 
