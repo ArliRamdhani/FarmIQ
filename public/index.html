@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmIQ 🌾 - Asisten Cerdas Pertanian, Peternakan & Pasar</title>
+  <meta name="description" content="FarmIQ - Platform AI Cerdas untuk Konsultasi Agronomi, Diagnosa Kesehatan Tanaman/Ternak (Foto & Suara), dan Update Pasar Komoditas.">
+
+  <!-- Favicon & Touch Icons with User Provided Logo -->
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="shortcut icon" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+
+  <!-- Immediate Theme Initialization to prevent Flash of Unstyled Content (FOUC) -->
+  <script>
+    (function () {
+      const storedTheme = localStorage.getItem('farmiq_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Highlight.js for code/structured blocks -->
+  <link id="hljsTheme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .dark ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(34, 197, 94, 0.35);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(34, 197, 94, 0.65);
+    }
+
+    /* Markdown Styling in AI Responses (Light Mode Defaults) */
+    .prose-ai {
+      color: #334155;
+      line-height: 1.75;
+      font-size: 0.925rem;
+    }
+    .prose-ai h1, .prose-ai h2, .prose-ai h3, .prose-ai h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .prose-ai h1 { font-size: 1.35rem; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.4rem; }
+    .prose-ai h2 { font-size: 1.2rem; color: #15803d; }
+    .prose-ai h3 { font-size: 1.05rem; color: #0d9488; }
+    .prose-ai h4 { font-size: 0.95rem; color: #166534; }
+    .prose-ai p { margin-bottom: 0.75rem; color: #334155; }
+    .prose-ai ul, .prose-ai ol { margin-left: 1.25rem; margin-bottom: 0.85rem; color: #334155; }
+    .prose-ai ul { list-style-type: disc; }
+    .prose-ai ol { list-style-type: decimal; }
+    .prose-ai li { margin-bottom: 0.35rem; }
+    .prose-ai strong, .prose-ai b {
+      color: #14532d;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.12);
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.3rem;
+      border: 1px solid rgba(22, 163, 74, 0.25);
+      display: inline-block;
+    }
+    .prose-ai blockquote {
+      border-left: 4px solid #16a34a;
+      background: rgba(240, 253, 244, 0.85);
+      color: #166534;
+      padding: 0.75rem 1rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 0.85rem 0;
+      font-style: italic;
+      border-top: 1px solid rgba(34, 197, 94, 0.2);
+      border-right: 1px solid rgba(34, 197, 94, 0.2);
+      border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+    }
+    .prose-ai blockquote strong {
+      background: rgba(34, 197, 94, 0.2);
+      color: #0f5132;
+    }
+    .prose-ai code {
+      background-color: #f1f5f9;
+      color: #0f766e;
+      padding: 0.15rem 0.45rem;
+      border-radius: 0.375rem;
+      font-size: 0.875em;
+      border: 1px solid #cbd5e1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .prose-ai pre code {
+      background-color: #f8fafc;
+      color: #0f172a;
+      padding: 1rem;
+      display: block;
+      overflow-x: auto;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+    }
+    .prose-ai table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .prose-ai th, .prose-ai td {
+      border: 1px solid #e2e8f0;
+      padding: 0.6rem 0.85rem;
+      text-align: left;
+    }
+    .prose-ai th {
+      background-color: #f0fdf4;
+      color: #166534;
+      font-weight: 600;
+    }
+    .prose-ai td {
+      background-color: #ffffff;
+      color: #334155;
+    }
+    .prose-ai hr {
+      border: 0;
+      border-top: 1px solid #e2e8f0;
+      margin: 1.25rem 0;
+    }
+
+    /* Markdown Styling in AI Responses (Dark Mode Overrides) */
+    .dark .prose-ai {
+      color: #cbd5e1;
+    }
+    .dark .prose-ai h1 { font-size: 1.35rem; color: #f8fafc; border-bottom: 1px solid #334155; }
+    .dark .prose-ai h2 { color: #4ade80; }
+    .dark .prose-ai h3 { color: #5eead4; }
+    .dark .prose-ai h4 { color: #86efac; }
+    .dark .prose-ai p { color: #cbd5e1; }
+    .dark .prose-ai ul, .dark .prose-ai ol { color: #cbd5e1; }
+    .dark .prose-ai strong, .dark .prose-ai b {
+      color: #ffffff;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+    .dark .prose-ai blockquote {
+      border-left: 4px solid #22c55e;
+      background: rgba(6, 78, 59, 0.35);
+      color: #dcfce7;
+      border-top: 1px solid rgba(34, 197, 94, 0.2);
+      border-right: 1px solid rgba(34, 197, 94, 0.2);
+      border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+    }
+    .dark .prose-ai blockquote strong {
+      background: rgba(34, 197, 94, 0.25);
+      color: #ffffff;
+    }
+    .dark .prose-ai code {
+      background-color: #0f172a;
+      color: #34d399;
+      border: 1px solid #334155;
+    }
+    .dark .prose-ai pre code {
+      background-color: #0b1120;
+      color: #f8fafc;
+      border: 1px solid #1e293b;
+    }
+    .dark .prose-ai th, .dark .prose-ai td {
+      border: 1px solid #334155;
+    }
+    .dark .prose-ai th {
+      background-color: rgba(6, 78, 59, 0.6);
+      color: #86efac;
+    }
+    .dark .prose-ai td {
+      background-color: rgba(15, 23, 42, 0.5);
+      color: #cbd5e1;
+    }
+    .dark .prose-ai hr {
+      border-top: 1px solid #334155;
+    }
+
+    #themeIcon, #headerThemeIcon {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+    }
+
+    /* Live Recording Pulse Effect */
+    @keyframes recording-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+    }
+    .animate-recording {
+      animation: recording-pulse 1.2s infinite ease-in-out;
+    }
+
+    /* Star rating active state */
+    .star-rating-btn.active {
+      color: #f59e0b;
+      transform: scale(1.15);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans h-full flex overflow-hidden antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
+
+  <!-- MOBILE SIDEBAR BACKDROP OVERLAY -->
+  <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity duration-300"></div>
+
+  <!-- ========================================== -->
+  <!-- SIDEBAR / SIDEPANEL NAVIGATION            -->
+  <!-- ========================================== -->
+  <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-72 sm:w-80 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out transform -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
+    
+    <!-- SIDEBAR TOP: Brand Header with Large Crisp Emblem, Title & Slogan -->
+    <div class="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-3.5 min-w-0 group py-0.5">
+        <!-- Crisp High-Res Emblem Icon -->
+        <div class="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900 dark:bg-slate-800 p-1.5 shadow-lg ring-2 ring-emerald-500/30 shrink-0 group-hover:scale-105 transition-transform">
+          <img src="/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
+          <span class="absolute -top-1 -right-1 flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+        </div>
+        <!-- Clean, Sharp Typography for Name & Slogan -->
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white tracking-tight leading-none">
+              Farm<span class="text-brand-600 dark:text-brand-400">IQ</span>
+            </h1>
+            <span class="text-[9px] bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-mono font-bold px-1.5 py-0.2 rounded border border-emerald-300/60 dark:border-emerald-700/60">AI</span>
+          </div>
+          <p class="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 tracking-tight leading-tight mt-1 truncate">
+            Asisten Cerdas Pertanian & Ternak
+          </p>
+        </div>
+      </a>
+
+      <!-- Close Sidebar Button (Mobile only) -->
+      <button id="closeSidebarBtn" class="md:hidden p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer shrink-0" aria-label="Tutup Sidebar">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- SIDEBAR MIDDLE: Mode Layanan & Quick Stats (Scrollable) -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-5">
+      
+      <!-- MODE LAYANAN SELECTOR -->
+      <div>
+        <div class="flex items-center justify-between px-2 mb-2.5">
+          <span class="text-[11px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Mode Layanan AI</span>
+          <span class="text-[10px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60 font-medium">3 Tersedia</span>
+        </div>
+
+        <div class="space-y-2">
+          
+          <!-- Mode 1: Konsultasi Umum -->
+          <button onclick="switchServiceMode('consultation')" id="modeBtn-consultation" class="w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-start space-x-3 group relative bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500/60 dark:border-emerald-500/60 text-emerald-950 dark:text-emerald-200 shadow-sm cursor-pointer">
+            <div class="service-icon-box w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300/40 dark:border-emerald-500/30 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-all">
+              <i class="fa-solid fa-comments"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <span class="service-title text-xs font-bold font-display text-slate-900 dark:text-white">Konsultasi Umum</span>
+                <span class="mode-active-indicator w-2 h-2 rounded-full bg-emerald-500"></span>
+              </div>
+              <p class="service-desc text-[11px] text-emerald-800/90 dark:text-emerald-300/80 leading-tight mt-0.5 line-clamp-2">Tanya jawab budidaya, formula pupuk, jadwal tanam & ternak</p>
+            </div>
+          </button>
+
+          <!-- Mode 2: Check Kesehatan -->
+          <button onclick="switchServiceMode('diagnosis')" id="modeBtn-diagnosis" class="w-full text-left p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-100/90 dark:hover:bg-slate-800 transition-all duration-200 flex items-start space-x-3 group relative text-slate-700 dark:text-slate-300 cursor-pointer">
+            <div class="service-icon-box w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-800 flex items-center justify-center text-base shrink-0 group-hover:scale-105 group-hover:text-rose-600 dark:group-hover:text-rose-400 group-hover:bg-rose-50 dark:group-hover:bg-rose-950/40 transition-all">
+              <i class="fa-solid fa-stethoscope"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <span class="service-title text-xs font-semibold font-display text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">Check Kesehatan</span>
+                <span class="mode-active-indicator w-2 h-2 rounded-full bg-rose-500 hidden"></span>
+              </div>
+              <p class="service-desc text-[11px] text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 leading-tight mt-0.5 line-clamp-2">Diagnosa foto penyakit tanaman, hama & patologi ternak</p>
+            </div>
+          </button>
+
+          <!-- Mode 3: Update Informasi & Pasar Komoditas -->
+          <button onclick="switchServiceMode('market')" id="modeBtn-market" class="w-full text-left p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-100/90 dark:hover:bg-slate-800 transition-all duration-200 flex items-start space-x-3 group relative text-slate-700 dark:text-slate-300 cursor-pointer">
+            <div class="service-icon-box w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-800 flex items-center justify-center text-base shrink-0 group-hover:scale-105 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:bg-sky-50 dark:group-hover:bg-sky-950/40 transition-all">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <span class="service-title text-xs font-semibold font-display text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">Update Info & Pasar</span>
+                <span class="mode-active-indicator w-2 h-2 rounded-full bg-sky-500 hidden"></span>
+              </div>
+              <p class="service-desc text-[11px] text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 leading-tight mt-0.5 line-clamp-2">Tren harga komoditas harian, info cuaca & subsidi pupuk</p>
+            </div>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- QUICK AGRONOMY WIDGET WITH MEASUREMENT LOCATION -->
+      <div class="bg-slate-50/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 rounded-xl p-3.5 space-y-3">
+        <div>
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-sun text-amber-500"></i> Info Cuaca Tani</span>
+            <span class="text-[10px] text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md font-medium border border-emerald-200/50 dark:border-emerald-800/50">Optimal</span>
+          </div>
+          <div class="flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
+            <i class="fa-solid fa-location-dot text-xs text-rose-500"></i>
+            <span class="truncate">Sentra Tani Sukamandi, Subang (Jabar)</span>
+          </div>
+          <p class="text-[10px] text-slate-400 dark:text-slate-400 pl-3.5">Stasiun Agroklimatologi BMKG</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-center">
+          <div class="bg-white dark:bg-slate-800/90 p-2 rounded-lg border border-slate-200/60 dark:border-slate-700/60 shadow-sm">
+            <p class="text-[10px] text-slate-400 dark:text-slate-400">Suhu Lapangan</p>
+            <p class="text-xs font-bold text-slate-800 dark:text-slate-100">29°C Cerah</p>
+          </div>
+          <div class="bg-white dark:bg-slate-800/90 p-2 rounded-lg border border-slate-200/60 dark:border-slate-700/60 shadow-sm">
+            <p class="text-[10px] text-slate-400 dark:text-slate-400">Kelembaban</p>
+            <p class="text-xs font-bold text-slate-800 dark:text-slate-100">76% Seimbang</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SYSTEM STATUS INFO -->
+      <div class="px-2 py-1 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
+        <div class="flex items-center justify-between">
+          <span>Layanan AI:</span>
+          <span class="font-semibold text-emerald-700 dark:text-emerald-400">Spesialis Tani & Ternak</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span>Metode Input:</span>
+          <span class="text-xs text-slate-700 dark:text-slate-300 font-medium">Teks • Foto • Suara</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span>Status Sistem:</span>
+          <span class="text-emerald-700 dark:text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Siap Membantu</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR BOTTOM: Feedback Beta & About FarmIQ Buttons -->
+    <div class="p-4 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 space-y-2">
+      
+      <!-- Button to Open Feedback Form Modal -->
+      <button id="feedbackBetaBtn" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/50 border border-emerald-300/80 dark:border-emerald-700/60 text-xs font-semibold text-emerald-900 dark:text-emerald-200 hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/60 dark:hover:to-teal-900/60 transition shadow-sm group cursor-pointer">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs group-hover:scale-110 transition-transform shadow-sm">
+            <i class="fa-solid fa-comment-dots"></i>
+          </div>
+          <div class="text-left">
+            <p class="font-bold text-emerald-950 dark:text-emerald-100 leading-none">Beri Masukan</p>
+            <p class="text-[10px] text-emerald-700 dark:text-emerald-400 mt-0.5">Saran & Umpan Balik</p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-[10px] text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform"></i>
+      </button>
+
+      <!-- Button to Open About FarmIQ Info Modal -->
+      <button id="aboutFarmIQBtn" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition shadow-sm group cursor-pointer">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-circle-info"></i>
+          </div>
+          <div class="text-left">
+            <p class="font-bold text-slate-900 dark:text-white leading-none">Tentang FarmIQ</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Panduan & Info Chatbot</p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+      </button>
+
+      <p class="text-[10px] text-center text-slate-400 dark:text-slate-500 pt-0.5">
+        FarmIQ • Asisten Tani & Ternak Pintar
+      </p>
+    </div>
+
+  </aside>
+
+  <!-- ========================================== -->
+  <!-- MAIN DASHBOARD CONTENT AREA               -->
+  <!-- ========================================== -->
+  <div class="flex-1 flex flex-col h-full min-w-0 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+    
+    <!-- TOP HEADER BAR -->
+    <header class="h-16 px-4 sm:px-6 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between z-20 shrink-0">
+      
+      <!-- Left: Mobile Hamburger & Brand / Active Mode Title -->
+      <div class="flex items-center space-x-3 min-w-0">
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer shrink-0" aria-label="Buka Menu Sidebar">
+          <i class="fa-solid fa-bars text-base"></i>
+        </button>
+
+        <!-- Mobile Header Brand Logo & Slogan -->
+        <div class="md:hidden flex items-center space-x-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-slate-900 dark:bg-slate-800 p-1 flex items-center justify-center shrink-0 shadow-sm ring-1 ring-emerald-500/30">
+            <img src="/logo.png" alt="FarmIQ" class="w-full h-full object-contain">
+          </div>
+          <div class="min-w-0">
+            <span class="font-display font-extrabold text-base text-slate-900 dark:text-white tracking-tight leading-none block">
+              Farm<span class="text-brand-600 dark:text-brand-400">IQ</span>
+            </span>
+            <span class="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium leading-none block truncate mt-0.5">
+              Asisten Cerdas Pertanian & Ternak
+            </span>
+          </div>
+        </div>
+
+        <div class="hidden sm:block min-w-0">
+          <div class="flex items-center space-x-2">
+            <span id="activeModeBadge" class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs shrink-0">
+              <i id="activeModeIcon" class="fa-solid fa-comments"></i>
+            </span>
+            <h2 id="activeModeTitle" class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white truncate">
+              Konsultasi Umum Agronomi
+            </h2>
+          </div>
+          <p id="activeModeDesc" class="text-xs text-slate-500 dark:text-slate-400 truncate">
+            Tanya jawab seputar teknik bertani, dosis pemupukan berimbang & peternakan
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Action Badges & Header Control Buttons -->
+      <div class="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
+        
+        <!-- Header Quick Theme Toggle -->
+        <button id="headerThemeToggleBtn" type="button" aria-label="Ganti Tema Tampilan" title="Ganti Tema" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition text-sm flex items-center gap-1.5 px-3 shadow-sm cursor-pointer">
+          <i id="headerThemeIcon" class="fa-solid fa-moon text-amber-500 dark:text-amber-400"></i>
+          <span id="headerThemeLabel" class="hidden sm:inline text-xs font-medium">Mode Gelap</span>
+        </button>
+
+        <!-- Header Reset Chat Button -->
+        <button id="headerClearChatBtn" title="Reset Percakapan" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 transition text-sm flex items-center gap-1.5 px-3 shadow-sm cursor-pointer">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span class="hidden sm:inline text-xs font-medium">Reset</span>
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- MAIN CHAT & DASHBOARD VIEW CONTAINER -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col space-y-6 max-w-5xl w-full mx-auto" id="chatContainer">
+      
+      <!-- ========================================== -->
+      <!-- DYNAMIC SERVICE MODE WELCOME BANNERS       -->
+      <!-- ========================================== -->
+
+      <!-- HERO 1: Konsultasi Umum Hero View -->
+      <div id="hero-consultation" class="mode-hero-card bg-gradient-to-br from-white via-emerald-50/50 to-teal-50/60 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/50 border border-emerald-200/80 dark:border-emerald-500/30 rounded-2xl p-5 sm:p-6 shadow-lg dark:shadow-xl backdrop-blur-sm transition-all duration-300 space-y-5">
+        
+        <!-- Header Banner with Logo -->
+        <div class="flex flex-col md:flex-row gap-4 items-start">
+          <div class="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-emerald-500/30 p-2 flex items-center justify-center shrink-0 shadow-md">
+            <img src="/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
+          </div>
+          <div class="flex-1 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-lg sm:text-xl font-display font-bold text-slate-900 dark:text-white">Konsultasi Pertanian & Peternakan Terpadu 🌿</h3>
+              <span class="text-xs bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full font-medium">Mode Konsultasi</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Diskusikan strategi bercocok tanam, kalkulasi pemupukan berimbang (NPK/Urea/Organik), irigasi, dan formulasi pakan ternak langsung dengan asisten cerdas FarmIQ.
+            </p>
+          </div>
+        </div>
+
+        <!-- SECTION: PANDUAN BUDIDAYA PEMULA & SKALA RUMAHAN -->
+        <div class="pt-1 border-t border-emerald-200/60 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-emerald-900 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-house-chimney-window text-emerald-600 dark:text-emerald-400"></i> Panduan Budidaya Pemula & Skala Rumahan (Pekarangan / Lahan Sempit):
+            </p>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400">Klik kartu untuk panduan instan</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            
+            <!-- 1. Kangkung & Bayam -->
+            <button onclick="applyPresetPrompt('Bagaimana panduan lengkap menanam kangkung dan bayam di polybag pekarangan rumah agar bisa panen cepat dalam 20-25 hari untuk pemula?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-3 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-emerald-600 dark:text-emerald-400 text-lg mt-0.5">🥬</span>
+              <div>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Kangkung & Bayam Rumahan</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">Panen cepat 20-25 hari, hemat lahan polybag pekarangan</span>
+              </div>
+            </button>
+
+            <!-- 2. Cabai Rawit Pot -->
+            <button onclick="applyPresetPrompt('Bagaimana cara menanam cabai rawit di pot/polybag pekarangan rumah dari biji, racikan media tanam yang gembur, dan pemupukan agar buahnya lebat?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-3 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-rose-500 text-lg mt-0.5">🌶️</span>
+              <div>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Cabai Rawit di Pot / Polybag</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">Racikan media tanam subur & rahasia buah lebat anti rontok</span>
+              </div>
+            </button>
+
+            <!-- 3. Jamur Tiram -->
+            <button onclick="applyPresetPrompt('Bagaimana panduan budidaya jamur tiram rumahan dengan baglog siap pakai, cara menjaga kelembaban ruangan teduh, dan jadwal panennya untuk pemula?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-3 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-amber-500 text-lg mt-0.5">🍄</span>
+              <div>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Budidaya Jamur Tiram</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">Mudah dirawat di ruangan teduh pekarangan & modal kecil</span>
+              </div>
+            </button>
+
+            <!-- 4. Ayam Petelur Rumahan -->
+            <button onclick="applyPresetPrompt('Bagaimana panduan memelihara ayam petelur skala rumahan 10-20 ekor, kebutuhan pakan harian, desain kandang baterai mini, dan menjaga produksi telur stabil?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-3 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-amber-600 text-lg mt-0.5">🐔</span>
+              <div>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Ayam Petelur Skala 10-20 Ekor</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">Kandang mini pekarangan & produksi telur konsumsi harian</span>
+              </div>
+            </button>
+
+            <!-- 5. Budikdamber Lele -->
+            <button onclick="applyPresetPrompt('Bagaimana cara membuat sistem Budikdamber (budidaya ikan lele dan kangkung dalam ember 80 liter) untuk pemula dari persiapan air, pakan, hingga panen?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-3 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-sky-500 text-lg mt-0.5">🐟</span>
+              <div>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Budikdamber (Ikan + Sayur Ember)</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">Ternak ikan lele & sayur kangkung hemat air dalam ember</span>
+              </div>
+            </button>
+
+            <!-- 6. Kelinci Rumahan -->
+            <button onclick="applyPresetPrompt('Bagaimana panduan beternak kelinci rumahan untuk pemula, manajemen pakan hijauan/pelet, kandang sehat, dan pencegahan penyakit kembung?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-3 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-indigo-500 text-lg mt-0.5">🐰</span>
+              <div>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Ternak Kelinci Pemula</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">Pakan hijauan lokal, perkembangbiakan cepat & bersih</span>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- PERTANYAAN CEPAT AGRONOMI UMUM -->
+        <div class="pt-2 border-t border-emerald-200/60 dark:border-slate-800">
+          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt text-brand-600 dark:text-brand-400 text-xs"></i> Tanya Jawab Agronomi Lanjutan:
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button onclick="applyPresetPrompt('Berapa takaran pupuk NPK, Urea, dan SP-36 yang optimal untuk tanaman padi pada masa vegetatif dan generatif?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-emerald-600 dark:text-emerald-400 text-sm mt-0.5"><i class="fa-solid fa-flask group-hover:scale-110 transition-transform"></i></span>
+              <div>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Dosis Pemupukan Padi</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">Kalkulasi takaran NPK, Urea & SP-36 berimbang</span>
+              </div>
+            </button>
+
+            <button onclick="applyPresetPrompt('Bagaimana pola rotasi tanaman hortikultura yang efektif untuk memutus siklus hama dan menjaga kesuburan tanah?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-emerald-50/80 dark:hover:bg-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+              <span class="text-brand-600 dark:text-brand-400 text-sm mt-0.5"><i class="fa-solid fa-arrows-spin group-hover:scale-110 transition-transform"></i></span>
+              <div>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 block group-hover:text-emerald-700 dark:group-hover:text-emerald-400">Pola Rotasi Tanaman</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">Strategi memutus hama & regenerasi hara tanah</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HERO 2: Check Kesehatan Hero View -->
+      <div id="hero-diagnosis" class="mode-hero-card hidden bg-gradient-to-br from-white via-rose-50/40 to-amber-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-rose-950/50 border border-rose-200/80 dark:border-rose-500/30 rounded-2xl p-6 shadow-lg dark:shadow-xl backdrop-blur-sm transition-all duration-300">
+        <div class="flex flex-col md:flex-row gap-5 items-start">
+          <div class="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-rose-500/30 p-2 flex items-center justify-center shrink-0 shadow-md">
+            <img src="/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
+          </div>
+          <div class="flex-1 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-lg sm:text-xl font-display font-bold text-slate-900 dark:text-white">Check Kesehatan & Diagnosa AI 🩺</h3>
+              <span class="text-xs bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 px-2.5 py-0.5 rounded-full font-medium">Foto & Visual Ready</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Unggah foto daun bergejala, bercak batang, hama tanaman, atau kondisi fisik ternak yang sakit. AI akan mendiagnosa patogen penyebab, menentukan tingkat keparahan, dan merekomendasikan solusi penanganan terarah.
+            </p>
+
+            <!-- Diagnostic Quick Dropzone Trigger -->
+            <div class="pt-1">
+              <button onclick="triggerImageUpload()" class="w-full border-2 border-dashed border-rose-300 dark:border-rose-500/40 hover:border-rose-500 bg-rose-50/60 dark:bg-rose-950/30 rounded-xl p-3.5 text-center transition group flex items-center justify-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-camera text-rose-500 text-2xl group-hover:scale-110 transition-transform"></i>
+                <div class="text-left">
+                  <span class="text-xs font-bold text-slate-800 dark:text-white block">Klik untuk Unggah Foto Gejala / Hama / Ternak</span>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400">Mendukung format JPG, PNG, WEBP (Maks 25MB)</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- Quick Action Diagnostic Prompts -->
+            <div class="pt-1">
+              <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-rose-500 text-xs"></i> Diagnosa Cepat:
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button onclick="applyPresetPrompt('Tanaman cabai saya mengalami daun menguning keriting, bercak cokelat melingkar, dan bunga rontok. Tolong diagnosa penyakit dan solusinya.')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-rose-50/80 dark:hover:bg-slate-800 hover:border-rose-400 dark:hover:border-rose-500/60 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+                  <span class="text-rose-500 text-sm mt-0.5"><i class="fa-solid fa-pepper-hot group-hover:scale-110 transition-transform"></i></span>
+                  <div>
+                    <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 block group-hover:text-rose-700 dark:group-hover:text-rose-400">Penyakit Daun Keriting Cabai</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">Gejala virus keriting & kutu kebul pada cabai</span>
+                  </div>
+                </button>
+
+                <button onclick="applyPresetPrompt('Apa tanda-tanda awal mastitis pada ambing sapi perah serta pertolongan pertama menggunakan antiseptik & antibiotik yang aman?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-rose-50/80 dark:hover:bg-slate-800 hover:border-rose-400 dark:hover:border-rose-500/60 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+                  <span class="text-amber-500 text-sm mt-0.5"><i class="fa-solid fa-heart-pulse group-hover:scale-110 transition-transform"></i></span>
+                  <div>
+                    <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 block group-hover:text-rose-700 dark:group-hover:text-rose-400">Diagnosa Mastitis Sapi Perah</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">Pembengkakan ambing & protokol pengobatan</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO 3: Update Info & Pasar Komoditas Hero View -->
+      <div id="hero-market" class="mode-hero-card hidden bg-gradient-to-br from-white via-sky-50/50 to-emerald-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-sky-950/50 border border-sky-200/80 dark:border-sky-500/30 rounded-2xl p-6 shadow-lg dark:shadow-xl backdrop-blur-sm transition-all duration-300">
+        <div class="space-y-4">
+          
+          <div class="flex flex-col md:flex-row gap-4 items-start justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-14 h-14 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-sky-500/30 p-2 flex items-center justify-center shrink-0 shadow-md">
+                <img src="/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-lg sm:text-xl font-display font-bold text-slate-900 dark:text-white">Update Harga Pasar & Info Komoditas 📈</h3>
+                  <span class="text-[11px] bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 px-2 py-0.5 rounded-full font-medium">Hari Ini</span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Rata-rata harga acuan komoditas pangan nasional (Pusat Informasi Harga Pangan)</p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2 text-xs">
+              <span class="text-slate-500 dark:text-slate-400">Klik kartu komoditas untuk analisis pasar AI:</span>
+            </div>
+          </div>
+
+          <!-- COMMODITY LIVE PRICE TICKER GRID -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            
+            <!-- Cabai Rawit -->
+            <button onclick="applyPresetPrompt('Bagaimana proyeksi tren harga Cabai Rawit Merah dalam 2-4 minggu ke depan dan kapan momentum terbaik menjual panen?')" class="text-left p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-rose-400 dark:hover:border-rose-500/60 hover:bg-rose-50/20 dark:hover:bg-slate-800 transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between text-base mb-1">
+                <span>🌶️</span>
+                <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200/50 dark:border-emerald-800/60 px-1.5 py-0.2 rounded">+3.2% ↗</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Cabai Rawit</p>
+              <p class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400">Rp 48.500<span class="text-[10px] font-normal text-slate-400">/kg</span></p>
+            </button>
+
+            <!-- Bawang Merah -->
+            <button onclick="applyPresetPrompt('Berapa estimasi pergerakan harga Bawang Merah dan sentimen pasokan dari sentra Brebes & Nganjuk saat ini?')" class="text-left p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500/60 hover:bg-amber-50/20 dark:hover:bg-slate-800 transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between text-base mb-1">
+                <span>🧅</span>
+                <span class="text-[10px] font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 border border-rose-200/50 dark:border-rose-800/60 px-1.5 py-0.2 rounded">-1.5% ↘</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Bawang Merah</p>
+              <p class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Rp 34.000<span class="text-[10px] font-normal text-slate-400">/kg</span></p>
+            </button>
+
+            <!-- Beras Medium -->
+            <button onclick="applyPresetPrompt('Bagaimana perkembangan harga Beras Medium dan harga Gabah Kering Panen (GKP) di tingkat petani saat ini?')" class="text-left p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500/60 hover:bg-emerald-50/20 dark:hover:bg-slate-800 transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between text-base mb-1">
+                <span>🌾</span>
+                <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700 px-1.5 py-0.2 rounded">Stabil ⟷</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Beras Medium</p>
+              <p class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Rp 13.800<span class="text-[10px] font-normal text-slate-400">/kg</span></p>
+            </button>
+
+            <!-- Jagung Pipil -->
+            <button onclick="applyPresetPrompt('Bagaimana permintaan jagung pipil kering untuk industri pakan ternak dan rekomendasi kadar air ideal saat penjualan?')" class="text-left p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500/60 hover:bg-amber-50/20 dark:hover:bg-slate-800 transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between text-base mb-1">
+                <span>🌽</span>
+                <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200/50 dark:border-emerald-800/60 px-1.5 py-0.2 rounded">+2.1% ↗</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Jagung Pipil</p>
+              <p class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400">Rp 6.200<span class="text-[10px] font-normal text-slate-400">/kg</span></p>
+            </button>
+
+            <!-- Daging Sapi -->
+            <button onclick="applyPresetPrompt('Bagaimana tren harga sapi potong bobot hidup dan proyeksi permintaan menjelang momentum hari besar?')" class="text-left p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-sky-400 dark:hover:border-sky-500/60 hover:bg-sky-50/20 dark:hover:bg-slate-800 transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between text-base mb-1">
+                <span>🥩</span>
+                <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700 px-1.5 py-0.2 rounded">Stabil ⟷</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Daging Sapi</p>
+              <p class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400">Rp 135.000<span class="text-[10px] font-normal text-slate-400">/kg</span></p>
+            </button>
+
+            <!-- Telur Ayam -->
+            <button onclick="applyPresetPrompt('Apa faktor utama yang mempengaruhi fluktuasi harga telur ayam ras dan bagaimana menekan biaya pakan layer?')" class="text-left p-3 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-yellow-400 dark:hover:border-yellow-500/60 hover:bg-yellow-50/20 dark:hover:bg-slate-800 transition shadow-sm group cursor-pointer">
+              <div class="flex items-center justify-between text-base mb-1">
+                <span>🥚</span>
+                <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200/50 dark:border-emerald-800/60 px-1.5 py-0.2 rounded">+1.8% ↗</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Telur Ayam</p>
+              <p class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-400">Rp 28.500<span class="text-[10px] font-normal text-slate-400">/kg</span></p>
+            </button>
+
+          </div>
+
+          <!-- Market Policy & Agribusiness Insight Prompts -->
+          <div class="pt-1">
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-newspaper text-sky-500 text-xs"></i> Topik Analisis Pasar & Regulasi:
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button onclick="applyPresetPrompt('Bagaimana ketentuan dan syarat alokasi pupuk bersubsidi (e-RDKK) serta jenis pupuk yang disubsidi tahun ini?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-sky-50/80 dark:hover:bg-slate-800 hover:border-sky-400 dark:hover:border-sky-500/60 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+                <span class="text-sky-500 text-sm mt-0.5"><i class="fa-solid fa-file-invoice-dollar group-hover:scale-110 transition-transform"></i></span>
+                <div>
+                  <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 block group-hover:text-sky-700 dark:group-hover:text-sky-300">Info Subsidi Pupuk & e-RDKK</span>
+                  <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">Mekanisme penebusan & kuota resmi pupuk subsidi</span>
+                </div>
+              </button>
+
+              <button onclick="applyPresetPrompt('Bagaimana strategi agribisnis menghadapi dampak anomali cuaca terhadap pasokan komoditas hortikultura?')" class="text-left bg-white/90 dark:bg-slate-900/80 hover:bg-sky-50/80 dark:hover:bg-slate-800 hover:border-sky-400 dark:hover:border-sky-500/60 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl transition duration-200 group flex items-start space-x-2.5 shadow-sm cursor-pointer">
+                <span class="text-teal-500 text-sm mt-0.5"><i class="fa-solid fa-cloud-rain group-hover:scale-110 transition-transform"></i></span>
+                <div>
+                  <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 block group-hover:text-sky-700 dark:group-hover:text-sky-300">Strategi Mitigasi Cuaca & Panen</span>
+                  <span class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">Manajemen rantai pasok & proteksi harga panen</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CHAT MESSAGE LOGS PER SERVICE MODE (Multi-tab chat flow) -->
+      <div id="messagesList-consultation" class="mode-messages-list space-y-5"></div>
+      <div id="messagesList-diagnosis" class="mode-messages-list hidden space-y-5"></div>
+      <div id="messagesList-market" class="mode-messages-list hidden space-y-5"></div>
+
+      <!-- TYPING / ANALYZING INDICATOR -->
+      <div id="loadingIndicator" class="hidden">
+        <div class="flex items-start space-x-3 max-w-2xl">
+          <div class="w-9 h-9 rounded-xl bg-slate-900 dark:bg-slate-800 p-1.5 flex items-center justify-center shadow-md shrink-0">
+            <img src="/logo.png" alt="FarmIQ Loading" class="w-full h-full object-contain animate-pulse">
+          </div>
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl rounded-tl-none p-4 shadow-md space-y-2">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-semibold text-brand-600 dark:text-emerald-400 font-display">FarmIQ Specialist</span>
+              <span id="loadingModeBadge" class="text-[10px] bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60 font-medium">Menganalisis</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-circle-notch fa-spin text-emerald-500 dark:text-emerald-400"></i>
+              <span>Sedang memproses dan menganalisis data pertanyaan...</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ERROR TOAST NOTIFICATION -->
+    <div class="px-4 sm:px-6 max-w-5xl w-full mx-auto">
+      <div id="errorToast" class="hidden mb-2 bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-600/50 text-rose-800 dark:text-rose-200 px-4 py-2.5 rounded-xl text-xs sm:text-sm flex items-center justify-between shadow-lg backdrop-blur-sm animate-pulse">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-circle-exclamation text-rose-500 dark:text-rose-400 text-base"></i>
+          <span id="errorMessage">Terjadi kesalahan.</span>
+        </div>
+        <button onclick="dismissError()" class="text-rose-500 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-200 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- INPUT & FILE UPLOAD FOOTER INTERFACE -->
+    <div class="p-3 sm:p-4 bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 shrink-0">
+      <div class="max-w-5xl mx-auto space-y-2">
+        
+        <!-- PREVIEW ATTACHMENTS (Image & Audio Voice Note) -->
+        <div class="flex flex-wrap gap-2">
+          
+          <!-- IMAGE PREVIEW CHIP -->
+          <div id="imagePreviewContainer" class="hidden p-2 bg-slate-100/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center space-x-2.5">
+              <img id="imagePreview" src="" alt="Unggahan Gambar" class="w-10 h-10 object-cover rounded-lg border border-slate-300 dark:border-slate-600 shadow-sm">
+              <div class="text-xs">
+                <p id="imageFileName" class="font-medium text-slate-800 dark:text-slate-200 truncate max-w-[150px] sm:max-w-[200px]"></p>
+                <p id="imageFileSize" class="text-slate-500 dark:text-slate-400 text-[10px]"></p>
+              </div>
+            </div>
+            <button id="removeImageBtn" type="button" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition cursor-pointer" title="Hapus Foto">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
+
+          <!-- AUDIO VOICE NOTE PREVIEW CHIP -->
+          <div id="audioPreviewContainer" class="hidden p-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300/80 dark:border-emerald-700/60 rounded-xl flex items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-microphone text-base"></i>
+              </div>
+              <div class="text-xs">
+                <p id="audioFileName" class="font-semibold text-emerald-900 dark:text-emerald-200">Voice Note</p>
+                <p id="audioDurationText" class="text-emerald-700/80 dark:text-emerald-400 text-[10px]">00:00</p>
+              </div>
+              <audio id="audioPreviewPlayer" controls class="h-8 max-w-[180px] sm:max-w-[240px]"></audio>
+            </div>
+            <button id="removeAudioBtn" type="button" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-100/50 dark:hover:bg-rose-950/50 rounded-lg transition cursor-pointer" title="Hapus Rekaman Suara">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- LIVE RECORDING OVERLAY BAR -->
+        <div id="liveRecordBar" class="hidden p-2.5 bg-rose-50 dark:bg-rose-950/70 border border-rose-300 dark:border-rose-700/80 rounded-xl flex items-center justify-between gap-3 shadow-sm animate-pulse">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-microphone animate-bounce text-sm"></i>
+            </div>
+            <div class="text-xs">
+              <p class="font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+                Merekam Suara...
+              </p>
+              <p id="liveRecordTimer" class="text-rose-600/90 dark:text-rose-400 text-[11px] font-mono font-medium">00:00 / 02:00</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="cancelRecordBtn" class="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950 border border-slate-200 dark:border-slate-700 rounded-lg transition cursor-pointer flex items-center gap-1">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Batal</span>
+            </button>
+            <button type="button" id="stopRecordBtn" class="px-3.5 py-1.5 text-xs font-medium text-white bg-rose-600 hover:bg-rose-500 rounded-lg transition shadow-sm cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-check"></i>
+              <span>Selesai</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- FORM INPUT -->
+        <form id="chatForm" class="space-y-2">
+          <div class="flex items-end space-x-2">
+            
+            <!-- ATTACH IMAGE BUTTON (Visible ONLY in Check Kesehatan mode) -->
+            <div id="attachImageWrapper" class="relative hidden">
+              <input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif" class="hidden">
+              <button type="button" id="attachBtn" class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition duration-200 shadow-sm cursor-pointer" title="Unggah Foto Tanaman/Hewan">
+                <i class="fa-solid fa-camera text-base"></i>
+              </button>
+            </div>
+
+            <!-- VOICE NOTE RECORDING BUTTON (Available in ALL Modes) -->
+            <button
+              type="button"
+              id="voiceRecordBtn"
+              class="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 flex items-center justify-center transition duration-200 shadow-sm cursor-pointer shrink-0"
+              title="Rekam Voice Note (Pertanyaan Suara)"
+            >
+              <i class="fa-solid fa-microphone text-base"></i>
+            </button>
+
+            <!-- PROMPT TEXTAREA (Adaptive height up to max-h-48) -->
+            <div class="flex-1 relative">
+              <textarea
+                id="promptInput"
+                rows="1"
+                placeholder="Ketik pertanyaan atau gunakan Voice Note..."
+                class="w-full bg-slate-100/90 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:bg-white dark:focus:bg-slate-800 resize-none transition max-h-48 sm:max-h-52 overflow-y-auto leading-relaxed"
+              ></textarea>
+            </div>
+
+            <!-- SUBMIT / SEND BUTTON -->
+            <button
+              type="submit"
+              id="sendBtn"
+              class="h-11 px-4 sm:px-5 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-medium text-xs sm:text-sm flex items-center justify-center space-x-1.5 sm:space-x-2 shadow-lg shadow-brand-500/25 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
+            >
+              <span>Kirim</span>
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+
+          </div>
+          
+          <!-- FOOTER TIP & ACTIVE MODE INDICATOR -->
+          <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-1 pt-0.5">
+            <div class="flex items-center gap-1.5 truncate">
+              <i class="fa-solid fa-circle-info text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+              <span id="inputTipText" class="truncate">Mode <strong>Konsultasi Umum</strong> aktif. Tekan <strong>Enter</strong> atau rekam Voice Note.</span>
+            </div>
+            <span class="hidden sm:inline text-slate-400 dark:text-slate-500 shrink-0 ml-2">Voice Note & Foto aktif</span>
+          </div>
+
+          <!-- AI DISCLAIMER NOTE -->
+          <p class="text-[11px] text-center text-slate-400 dark:text-slate-500 pt-1 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-triangle-exclamation text-[10px] text-amber-500 shrink-0"></i>
+            <span>FarmIQ adalah asisten kecerdasan buatan dan dapat membuat kesalahan. Selalu verifikasi informasi penting, diagnosa penyakit, dan dosis obat dengan tenaga ahli di lapangan.</span>
+          </p>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 1. FEEDBACK BETA MODAL DIALOG              -->
+  <!-- ========================================== -->
+  <div id="feedbackModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-md">
+            <i class="fa-solid fa-comment-dots"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">Masukan & Saran Pengguna</h3>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Bantu kami meningkatkan kualitas & akurasi FarmIQ</p>
+          </div>
+        </div>
+        <button id="closeFeedbackModalBtn" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition cursor-pointer" aria-label="Tutup">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
+        
+        <!-- Feedback Form -->
+        <form id="feedbackForm" class="space-y-4">
+          
+          <!-- Rating Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">Bagaimana penilaian Anda terhadap FarmIQ?</label>
+            <div class="flex items-center gap-2 p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div class="flex items-center gap-1 text-2xl" id="starRatingContainer">
+                <button type="button" class="star-rating-btn text-amber-400 hover:scale-125 transition-transform cursor-pointer" data-val="1">★</button>
+                <button type="button" class="star-rating-btn text-amber-400 hover:scale-125 transition-transform cursor-pointer" data-val="2">★</button>
+                <button type="button" class="star-rating-btn text-amber-400 hover:scale-125 transition-transform cursor-pointer" data-val="3">★</button>
+                <button type="button" class="star-rating-btn text-amber-400 hover:scale-125 transition-transform cursor-pointer" data-val="4">★</button>
+                <button type="button" class="star-rating-btn text-amber-400 hover:scale-125 transition-transform cursor-pointer" data-val="5">★</button>
+              </div>
+              <input type="hidden" id="feedbackRatingVal" value="5">
+              <span id="starRatingLabel" class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 ml-2">Sangat Membantu (5/5)</span>
+            </div>
+          </div>
+
+          <!-- Category Selection -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">Kategori Masukan</label>
+            <select id="feedbackCategory" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+              <option value="Saran Fitur">💡 Usulan & Saran Fitur Baru</option>
+              <option value="Kualitas Jawaban AI">🤖 Kualitas / Akurasi Respon AI</option>
+              <option value="Laporan Bug / Error">🐞 Laporan Kendala / Bug Sistem</option>
+              <option value="Info Pasar & Cuaca">📈 Umpan Balik Harga Pasar & Cuaca</option>
+              <option value="Lainnya">💬 Masukan / Apresiasi Lainnya</option>
+            </select>
+          </div>
+
+          <!-- User Name -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">Nama Anda / Kelompok Tani <span class="text-slate-400 font-normal">(Opsional)</span></label>
+            <input type="text" id="feedbackName" placeholder="Contoh: Pak Budi (Sentra Cabai Subang)" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+          </div>
+
+          <!-- Contact (WhatsApp / Email) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">No. WhatsApp / Email <span class="text-slate-400 font-normal">(Opsional, jika bersedia dihubungi)</span></label>
+            <input type="text" id="feedbackContact" placeholder="0812-xxxx-xxxx atau email@contoh.com" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+          </div>
+
+          <!-- Feedback Message -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">Pesan Masukan, Kritik, atau Saran <span class="text-rose-500">*</span></label>
+            <textarea id="feedbackMessage" rows="4" required placeholder="Tuliskan pengalaman Anda menggunakan FarmIQ, kendala yang ditemui, atau fitur yang Anda harapkan hadir..." class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none transition leading-relaxed"></textarea>
+          </div>
+
+          <!-- Alert status -->
+          <div id="feedbackAlert" class="hidden p-3 rounded-xl text-xs"></div>
+
+          <!-- Submit Button -->
+          <div class="flex items-center justify-end gap-2 pt-2">
+            <button type="button" onclick="closeFeedbackModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+              Batal
+            </button>
+            <button type="submit" id="submitFeedbackBtn" class="px-5 py-2.5 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-brand-500/25 transition cursor-pointer">
+              <span>Kirim Masukan</span>
+              <i class="fa-solid fa-paper-plane text-[10px]"></i>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. ABOUT FARMIQ MODAL DIALOG               -->
+  <!-- ========================================== -->
+  <div id="aboutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-emerald-500/30 p-1.5 shadow-md flex items-center justify-center shrink-0">
+            <img src="/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-display font-extrabold text-xl text-slate-900 dark:text-white leading-none">
+                Farm<span class="text-brand-600 dark:text-brand-400">IQ</span> Specialist
+              </h3>
+              <span class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full font-bold">Resmi</span>
+            </div>
+            <p class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-1">
+              Asisten Cerdas Pertanian & Ternak
+            </p>
+          </div>
+        </div>
+        <button id="closeAboutModalBtn" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" aria-label="Tutup Dialog">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        
+        <!-- Visi & Deskripsi -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
+            <i class="fa-solid fa-seedling text-emerald-600 dark:text-emerald-400"></i>
+            Apa itu FarmIQ?
+          </h4>
+          <p>
+            <strong>FarmIQ</strong> adalah platform asisten kecerdasan buatan terpadu yang dirancang khusus untuk mendampingi petani, peternak, penyuluh pertanian, dan praktisi agribisnis di Indonesia dalam mengambil keputusan budidaya yang presisi, efisien, dan ramah lingkungan.
+          </p>
+        </div>
+
+        <!-- Fitur Lengkap Input Teks, Foto & Suara -->
+        <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200/80 dark:border-slate-700/60 space-y-2.5">
+          <h4 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-brand-600 dark:text-brand-400"></i>
+            Fitur Lengkap (Teks, Foto & Suara):
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+            <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800">
+              <span class="text-emerald-600 dark:text-emerald-400 font-bold block text-xs">💬 Teks Interaktif</span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">Tanya jawab dosis pupuk, jadwal panen, dan tips budidaya.</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800">
+              <span class="text-rose-600 dark:text-rose-400 font-bold block text-xs">📷 Foto & Gambar</span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">Diagnosa visual daun berpenyakit, hama, dan luka ternak.</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800">
+              <span class="text-amber-600 dark:text-amber-400 font-bold block text-xs">🎙️ Suara & Voice Note</span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">Rekam pertanyaan langsung via mic saat tangan kotor di lahan.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Mode Layanan -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-sky-600 dark:text-sky-400"></i>
+            3 Mode Layanan Utama:
+          </h4>
+          <ul class="space-y-1.5 list-disc list-inside text-xs sm:text-sm pl-1">
+            <li><strong>Konsultasi Umum:</strong> Rekomendasi takaran pupuk NPK, rotasi tanaman, kesuburan tanah, panduan budidaya pemula (sayur polybag, jamur, ayam, ikan), dan formulasi pakan ternak.</li>
+            <li><strong>Check Kesehatan AI:</strong> Identifikasi patogen tanaman, hama wereng/thrips, defisiensi hara, dan patologi veteriner melalui foto dan rekaman suara.</li>
+            <li><strong>Update Info & Pasar Komoditas:</strong> Pantauan harga pangan harian real-time, sentimen pasokan, cuaca tani lokal, dan info subsidi pupuk e-RDKK.</li>
+          </ul>
+        </div>
+
+        <!-- Safety Advisory Note -->
+        <div class="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 rounded-xl text-amber-900 dark:text-amber-200 text-xs space-y-1">
+          <p class="font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-triangle-exclamation text-amber-600 dark:text-amber-400"></i>
+            Peringatan Keselamatan (Safety Advisory):
+          </p>
+          <p>
+            Rekomendasi bahan kimia atau pestisida adalah saran agronomi terpadu. Selalu gunakan Alat Pelindung Diri (APD) lengkap saat penyemprotan dan perhatikan masa tunggu panen (*Pre-Harvest Interval*).
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
+        <span class="text-[11px] text-slate-400">FarmIQ • Inovasi Agrikultur Digital</span>
+        <button onclick="closeAboutModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition cursor-pointer">
+          Mengerti & Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT CONTROLLER & LOGIC              -->
+  <!-- ========================================== -->
+  <script>
+    // ==========================================
+    // 1. Service Mode Controller Configuration
+    // ==========================================
+    let currentServiceMode = localStorage.getItem('farmiq_mode') || 'consultation';
+
+    const SERVICE_MODES = {
+      consultation: {
+        title: 'Konsultasi Umum Agronomi',
+        desc: 'Tanya jawab seputar teknik bertani, dosis pemupukan berimbang, panduan pemula & peternakan',
+        icon: 'fa-comments',
+        badgeBg: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400',
+        heroId: 'hero-consultation',
+        placeholder: 'Ketik pertanyaan budidaya, dosis pupuk, atau rekam Voice Note...',
+        tip: 'Mode <strong>Konsultasi Umum</strong> aktif. Tekan <strong>Enter</strong> atau klik mikrofon untuk Voice Note.',
+        activeBtn: 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500/60 dark:border-emerald-500/60 text-emerald-950 dark:text-emerald-200 shadow-sm',
+        activeIcon: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300/40 dark:border-emerald-500/30',
+        activeTitle: 'text-slate-900 dark:text-white font-bold',
+        activeDesc: 'text-emerald-800/90 dark:text-emerald-300/80',
+        inactiveIconHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40'
+      },
+      diagnosis: {
+        title: 'Check Kesehatan',
+        desc: 'Diagnosa foto penyakit tanaman, hama, defisiensi hara & kesehatan hewan ternak',
+        icon: 'fa-stethoscope',
+        badgeBg: 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400',
+        heroId: 'hero-diagnosis',
+        placeholder: 'Ketik gejala, rekam Voice Note, atau lampirkan foto...',
+        tip: 'Mode <strong>Check Kesehatan</strong> aktif. Lampirkan foto gejala atau rekam suara penjelasan.',
+        activeBtn: 'bg-rose-50/90 dark:bg-rose-950/50 border-rose-500/60 dark:border-rose-500/60 text-rose-950 dark:text-rose-200 shadow-sm',
+        activeIcon: 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300/40 dark:border-rose-500/30',
+        activeTitle: 'text-slate-900 dark:text-white font-bold',
+        activeDesc: 'text-rose-800/90 dark:text-rose-300/80',
+        inactiveIconHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400 group-hover:bg-rose-50 dark:group-hover:bg-rose-950/40'
+      },
+      market: {
+        title: 'Update Informasi & Pasar Komoditas',
+        desc: 'Pantauan harga komoditas pangan harian, tren pasar agribisnis & info regulasi',
+        icon: 'fa-chart-line',
+        badgeBg: 'bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400',
+        heroId: 'hero-market',
+        placeholder: 'Tanyakan tren harga komoditas atau rekam Voice Note...',
+        tip: 'Mode <strong>Update Pasar</strong> aktif. Tanyakan komoditas atau gunakan mikrofon untuk Voice Note.',
+        activeBtn: 'bg-sky-50/90 dark:bg-sky-950/50 border-sky-500/60 dark:border-sky-500/60 text-sky-950 dark:text-sky-200 shadow-sm',
+        activeIcon: 'bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-300/40 dark:border-sky-500/30',
+        activeTitle: 'text-slate-900 dark:text-white font-bold',
+        activeDesc: 'text-sky-800/90 dark:text-sky-300/80',
+        inactiveIconHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:bg-sky-50 dark:group-hover:bg-sky-950/40'
+      }
+    };
+
+    function switchServiceMode(modeKey) {
+      if (!SERVICE_MODES[modeKey]) return;
+      currentServiceMode = modeKey;
+      localStorage.setItem('farmiq_mode', modeKey);
+
+      const mode = SERVICE_MODES[modeKey];
+
+      // Update Header Text & Icons
+      document.getElementById('activeModeTitle').textContent = mode.title;
+      document.getElementById('activeModeDesc').textContent = mode.desc;
+      document.getElementById('activeModeIcon').className = 'fa-solid ' + mode.icon;
+      document.getElementById('activeModeBadge').className = 'w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 ' + mode.badgeBg;
+
+      // Update Input Placeholder & Tip
+      promptInput.placeholder = mode.placeholder;
+      document.getElementById('inputTipText').innerHTML = mode.tip;
+      document.getElementById('loadingModeBadge').textContent = 'Mode ' + mode.title.split(' ')[0];
+
+      // Update Sidebar Nav Button Styles
+      ['consultation', 'diagnosis', 'market'].forEach(key => {
+        const btn = document.getElementById(`modeBtn-${key}`);
+        const indicator = btn.querySelector('.mode-active-indicator');
+        const iconBox = btn.querySelector('.service-icon-box');
+        const titleEl = btn.querySelector('.service-title');
+        const descEl = btn.querySelector('.service-desc');
+        const modeConfig = SERVICE_MODES[key];
+
+        if (key === modeKey) {
+          btn.className = `w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-start space-x-3 group relative ${modeConfig.activeBtn} cursor-pointer`;
+          iconBox.className = `service-icon-box w-9 h-9 rounded-lg flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-all ${modeConfig.activeIcon}`;
+          titleEl.className = `service-title text-xs font-display ${modeConfig.activeTitle}`;
+          descEl.className = `service-desc text-[11px] leading-tight mt-0.5 line-clamp-2 ${modeConfig.activeDesc}`;
+          indicator.classList.remove('hidden');
+        } else {
+          btn.className = 'w-full text-left p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white/80 dark:bg-slate-800/60 hover:bg-slate-100/90 dark:hover:bg-slate-800 transition-all duration-200 flex items-start space-x-3 group relative text-slate-700 dark:text-slate-300 cursor-pointer';
+          iconBox.className = `service-icon-box w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-800 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-all ${modeConfig.inactiveIconHover}`;
+          titleEl.className = 'service-title text-xs font-semibold font-display text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white';
+          descEl.className = 'service-desc text-[11px] text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 leading-tight mt-0.5 line-clamp-2';
+          indicator.classList.add('hidden');
+        }
+      });
+
+      // Toggle Conditional Attach Image Button (Only in Check Kesehatan mode)
+      const attachImageWrapper = document.getElementById('attachImageWrapper');
+      if (modeKey === 'diagnosis') {
+        attachImageWrapper.classList.remove('hidden');
+      } else {
+        attachImageWrapper.classList.add('hidden');
+        clearSelectedImage();
+      }
+
+      // OPSI A: Multi-tab Chat Views per Mode
+      // 1. Hide all mode message lists, then show the active mode list
+      document.querySelectorAll('.mode-messages-list').forEach(list => list.classList.add('hidden'));
+      const activeList = document.getElementById(`messagesList-${modeKey}`);
+      if (activeList) activeList.classList.remove('hidden');
+
+      // 2. Hide all hero cards
+      document.querySelectorAll('.mode-hero-card').forEach(card => card.classList.add('hidden'));
+
+      // 3. Show hero card for this mode IF this mode has 0 messages
+      if (!activeList || activeList.children.length === 0) {
+        const activeCard = document.getElementById(mode.heroId);
+        if (activeCard) activeCard.classList.remove('hidden');
+      }
+
+      closeSidebar();
+    }
+
+    // ==========================================
+    // 2. Responsive Sidebar Drawer & Modals
+    // ==========================================
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    const aboutFarmIQBtn = document.getElementById('aboutFarmIQBtn');
+    const aboutModal = document.getElementById('aboutModal');
+    const closeAboutModalBtn = document.getElementById('closeAboutModalBtn');
+
+    const feedbackBetaBtn = document.getElementById('feedbackBetaBtn');
+    const feedbackModal = document.getElementById('feedbackModal');
+    const closeFeedbackModalBtn = document.getElementById('closeFeedbackModalBtn');
+
+    function openSidebar() {
+      sidebar.classList.remove('-translate-x-full');
+      sidebarOverlay.classList.remove('hidden');
+    }
+
+    function closeSidebar() {
+      sidebar.classList.add('-translate-x-full');
+      sidebarOverlay.classList.add('hidden');
+    }
+
+    mobileMenuBtn.addEventListener('click', openSidebar);
+    closeSidebarBtn.addEventListener('click', closeSidebar);
+    sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // About Modal Controls
+    function openAboutModal() {
+      aboutModal.classList.remove('hidden');
+      closeSidebar();
+    }
+
+    function closeAboutModal() {
+      aboutModal.classList.add('hidden');
+    }
+
+    aboutFarmIQBtn.addEventListener('click', openAboutModal);
+    closeAboutModalBtn.addEventListener('click', closeAboutModal);
+    aboutModal.addEventListener('click', (e) => {
+      if (e.target === aboutModal) closeAboutModal();
+    });
+
+    // Feedback Modal Controls
+    function openFeedbackModal() {
+      feedbackModal.classList.remove('hidden');
+      closeSidebar();
+    }
+
+    function closeFeedbackModal() {
+      feedbackModal.classList.add('hidden');
+    }
+
+    feedbackBetaBtn.addEventListener('click', openFeedbackModal);
+    closeFeedbackModalBtn.addEventListener('click', closeFeedbackModal);
+    feedbackModal.addEventListener('click', (e) => {
+      if (e.target === feedbackModal) closeFeedbackModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (!aboutModal.classList.contains('hidden')) closeAboutModal();
+        if (!feedbackModal.classList.contains('hidden')) closeFeedbackModal();
+      }
+    });
+
+    // Rating star selector interaction
+    const starButtons = document.querySelectorAll('.star-rating-btn');
+    const feedbackRatingVal = document.getElementById('feedbackRatingVal');
+    const starRatingLabel = document.getElementById('starRatingLabel');
+    const RATING_LABELS = {
+      1: 'Sangat Kurang (1/5)',
+      2: 'Kurang Puas (2/5)',
+      3: 'Cukup Membantu (3/5)',
+      4: 'Bagus & Bermanfaat (4/5)',
+      5: 'Sangat Membantu (5/5)'
+    };
+
+    starButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rating = parseInt(btn.getAttribute('data-rating'), 10);
+        feedbackRatingVal.value = rating;
+        starRatingLabel.textContent = RATING_LABELS[rating] || '';
+        
+        starButtons.forEach(s => {
+          const r = parseInt(s.getAttribute('data-rating'), 10);
+          const icon = s.querySelector('i');
+          if (r <= rating) {
+            icon.className = 'fa-solid fa-star text-amber-400';
+          } else {
+            icon.className = 'fa-regular fa-star text-slate-300 dark:text-slate-600';
+          }
+        });
+      });
+    });
+
+    // Feedback Form Submission
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackSubmitBtn = document.getElementById('feedbackSubmitBtn');
+    const feedbackAlert = document.getElementById('feedbackAlert');
+    const feedbackAlertMsg = document.getElementById('feedbackAlertMsg');
+
+    feedbackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      feedbackAlert.classList.add('hidden');
+
+      const name = document.getElementById('feedbackName').value.trim();
+      const contact = document.getElementById('feedbackContact').value.trim();
+      const category = document.getElementById('feedbackCategory').value;
+      const rating = parseInt(feedbackRatingVal.value, 10) || 5;
+      const message = document.getElementById('feedbackMessage').value.trim();
+
+      if (!message) {
+        feedbackAlertMsg.textContent = 'Mohon isi pesan saran atau masukan Anda.';
+        feedbackAlert.className = 'p-3 rounded-xl text-xs flex items-center gap-2 bg-rose-50 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-700/60';
+        feedbackAlert.classList.remove('hidden');
+        return;
+      }
+
+      feedbackSubmitBtn.disabled = true;
+      feedbackSubmitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Mengirim...</span>';
+
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, contact, category, rating, message })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Gagal menyimpan masukan.');
+        }
+
+        feedbackAlertMsg.textContent = data.message || 'Terima kasih atas masukan Anda!';
+        feedbackAlert.className = 'p-3 rounded-xl text-xs flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60';
+        feedbackAlert.classList.remove('hidden');
+
+        feedbackForm.reset();
+        feedbackRatingVal.value = '5';
+        starRatingLabel.textContent = RATING_LABELS[5];
+        starButtons.forEach(s => s.querySelector('i').className = 'fa-solid fa-star text-amber-400');
+
+        setTimeout(() => {
+          closeFeedbackModal();
+          feedbackAlert.classList.add('hidden');
+        }, 2200);
+
+      } catch (err) {
+        console.error('Feedback Error:', err);
+        feedbackAlertMsg.textContent = err.message || 'Terjadi kesalahan sistem saat mengirim masukan.';
+        feedbackAlert.className = 'p-3 rounded-xl text-xs flex items-center gap-2 bg-rose-50 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-700/60';
+        feedbackAlert.classList.remove('hidden');
+      } finally {
+        feedbackSubmitBtn.disabled = false;
+        feedbackSubmitBtn.innerHTML = '<span>Kirim Masukan</span><i class="fa-solid fa-paper-plane text-xs"></i>';
+      }
+    });
+
+    // ==========================================
+    // 3. Theme Toggle Controller
+    // ==========================================
+    const headerThemeToggleBtn = document.getElementById('headerThemeToggleBtn');
+    const headerThemeIcon = document.getElementById('headerThemeIcon');
+    const headerThemeLabel = document.getElementById('headerThemeLabel');
+
+    function applyTheme(isDark, save = true) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        headerThemeIcon.className = 'fa-solid fa-sun text-amber-400';
+        headerThemeLabel.textContent = 'Mode Terang';
+        if (save) localStorage.setItem('farmiq_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        headerThemeIcon.className = 'fa-solid fa-moon text-slate-700';
+        headerThemeLabel.textContent = 'Mode Gelap';
+        if (save) localStorage.setItem('farmiq_theme', 'light');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyTheme(!isDark, true);
+    }
+
+    headerThemeToggleBtn.addEventListener('click', toggleTheme);
+    applyTheme(document.documentElement.classList.contains('dark'), false);
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('farmiq_theme')) {
+        applyTheme(e.matches, false);
+      }
+    });
+
+    // ==========================================
+    // 4. Chat & Media Controller (Opsi A Multi-Tab + Voice Note)
+    // ==========================================
+    let selectedImageFile = null;
+    let recordedAudioBlob = null;
+    let recordedAudioFile = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordTimerInterval = null;
+    let recordSeconds = 0;
+    let isProcessing = false;
+
+    // DOM Elements
+    const chatContainer = document.getElementById('chatContainer');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const errorToast = document.getElementById('errorToast');
+    const errorMessage = document.getElementById('errorMessage');
+
+    const chatForm = document.getElementById('chatForm');
+    const promptInput = document.getElementById('promptInput');
+    const imageInput = document.getElementById('imageInput');
+    const attachBtn = document.getElementById('attachBtn');
+    const attachImageWrapper = document.getElementById('attachImageWrapper');
+    const voiceRecordBtn = document.getElementById('voiceRecordBtn');
+    const liveRecordBar = document.getElementById('liveRecordBar');
+    const liveRecordTimer = document.getElementById('liveRecordTimer');
+    const cancelRecordBtn = document.getElementById('cancelRecordBtn');
+    const stopRecordBtn = document.getElementById('stopRecordBtn');
+
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const imageFileName = document.getElementById('imageFileName');
+    const imageFileSize = document.getElementById('imageFileSize');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+
+    const audioPreviewContainer = document.getElementById('audioPreviewContainer');
+    const audioPreviewPlayer = document.getElementById('audioPreviewPlayer');
+    const audioFileName = document.getElementById('audioFileName');
+    const audioDurationText = document.getElementById('audioDurationText');
+    const removeAudioBtn = document.getElementById('removeAudioBtn');
+
+    const sendBtn = document.getElementById('sendBtn');
+    const headerClearChatBtn = document.getElementById('headerClearChatBtn');
+
+    // Configure Marked.js options
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+      highlight: function(code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
+      }
+    });
+
+    promptInput.addEventListener('input', function () {
+      this.style.height = 'auto';
+      const maxHeight = 200;
+      this.style.height = Math.min(this.scrollHeight, maxHeight) + 'px';
+    });
+
+    promptInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        chatForm.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    // Preset Prompt Card Click Handler
+    window.applyPresetPrompt = function(presetText) {
+      if (!presetText) return;
+      promptInput.value = presetText;
+      promptInput.style.height = 'auto';
+      const maxHeight = 200;
+      promptInput.style.height = Math.min(promptInput.scrollHeight, maxHeight) + 'px';
+      promptInput.focus();
+
+      // Place cursor at the end of the text
+      promptInput.setSelectionRange(presetText.length, presetText.length);
+
+      // Scroll smoothly to bottom
+      scrollToBottom();
+      dismissError();
+    };
+
+    // Image Upload Handling
+    window.triggerImageUpload = function() { imageInput.click(); };
+    attachBtn.addEventListener('click', () => { imageInput.click(); });
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 25 * 1024 * 1024) {
+        showError('Ukuran file gambar melebihi batas 25MB.');
+        imageInput.value = '';
+        return;
+      }
+
+      selectedImageFile = file;
+      imageFileName.textContent = file.name;
+      imageFileSize.textContent = formatBytes(file.size);
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        imagePreview.src = event.target.result;
+        imagePreviewContainer.classList.remove('hidden');
+        dismissError();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeImageBtn.addEventListener('click', () => { clearSelectedImage(); });
+
+    function clearSelectedImage() {
+      selectedImageFile = null;
+      imageInput.value = '';
+      imagePreview.src = '';
+      imagePreviewContainer.classList.add('hidden');
+    }
+
+    // ==========================================
+    // Voice Note (Live Mic Recording) Handler
+    // ==========================================
+    async function startAudioRecording() {
+      if (isProcessing) return;
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showError('Browser Anda tidak mendukung perekaman audio mikrofon.');
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        let mimeType = 'audio/webm';
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+          mimeType = 'audio/webm;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+          mimeType = 'audio/webm';
+        } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+          mimeType = 'audio/mp4';
+        } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+          mimeType = 'audio/ogg';
+        }
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          stream.getTracks().forEach(track => track.stop());
+          if (audioChunks.length === 0) return;
+
+          const recordedType = mediaRecorder.mimeType || 'audio/webm';
+          recordedAudioBlob = new Blob(audioChunks, { type: recordedType });
+          const ext = recordedType.includes('mp4') ? 'm4a' : recordedType.includes('ogg') ? 'ogg' : 'webm';
+          recordedAudioFile = new File([recordedAudioBlob], `voice_note_${Date.now()}.${ext}`, { type: recordedType });
+
+          const audioUrl = URL.createObjectURL(recordedAudioBlob);
+          audioPreviewPlayer.src = audioUrl;
+          audioDurationText.textContent = formatDuration(recordSeconds);
+          audioFileName.textContent = `Voice Note (${formatDuration(recordSeconds)})`;
+          audioPreviewContainer.classList.remove('hidden');
+          dismissError();
+        };
+
+        mediaRecorder.start(250);
+        recordSeconds = 0;
+        liveRecordTimer.textContent = '00:00 / 02:00';
+        liveRecordBar.classList.remove('hidden');
+
+        voiceRecordBtn.className = 'w-11 h-11 rounded-xl bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center transition duration-200 shadow-md cursor-pointer shrink-0 animate-pulse';
+
+        recordTimerInterval = setInterval(() => {
+          recordSeconds++;
+          liveRecordTimer.textContent = `${formatDuration(recordSeconds)} / 02:00`;
+          if (recordSeconds >= 120) {
+            stopAudioRecording();
+          }
+        }, 1000);
+
+      } catch (err) {
+        console.error('Microphone Access Error:', err);
+        showError('Gagal mengakses mikrofon. Pastikan Anda telah memberikan izin akses mikrofon pada browser.');
+      }
+    }
+
+    function stopAudioRecording() {
+      if (recordTimerInterval) {
+        clearInterval(recordTimerInterval);
+        recordTimerInterval = null;
+      }
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      liveRecordBar.classList.add('hidden');
+      voiceRecordBtn.className = 'w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 flex items-center justify-center transition duration-200 shadow-sm cursor-pointer shrink-0';
+    }
+
+    function cancelAudioRecording() {
+      if (recordTimerInterval) {
+        clearInterval(recordTimerInterval);
+        recordTimerInterval = null;
+      }
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.onstop = (e) => {
+          mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        };
+        mediaRecorder.stop();
+      }
+      audioChunks = [];
+      liveRecordBar.classList.add('hidden');
+      voiceRecordBtn.className = 'w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 flex items-center justify-center transition duration-200 shadow-sm cursor-pointer shrink-0';
+    }
+
+    function clearRecordedAudio() {
+      recordedAudioBlob = null;
+      recordedAudioFile = null;
+      audioChunks = [];
+      if (audioPreviewPlayer.src) {
+        audioPreviewPlayer.pause();
+        audioPreviewPlayer.src = '';
+      }
+      audioPreviewContainer.classList.add('hidden');
+    }
+
+    removeAudioBtn.addEventListener('click', clearRecordedAudio);
+    stopRecordBtn.addEventListener('click', stopAudioRecording);
+    cancelRecordBtn.addEventListener('click', cancelAudioRecording);
+
+    voiceRecordBtn.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        stopAudioRecording();
+      } else {
+        startAudioRecording();
+      }
+    });
+
+    function formatDuration(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function resetChat() {
+      const activeList = document.getElementById(`messagesList-${currentServiceMode}`);
+      if (activeList) activeList.innerHTML = '';
+
+      document.querySelectorAll('.mode-hero-card').forEach(card => card.classList.add('hidden'));
+      const activeCard = document.getElementById(SERVICE_MODES[currentServiceMode].heroId);
+      if (activeCard) activeCard.classList.remove('hidden');
+
+      clearSelectedImage();
+      clearRecordedAudio();
+      promptInput.value = '';
+      promptInput.style.height = 'auto';
+      dismissError();
+    }
+
+    headerClearChatBtn.addEventListener('click', resetChat);
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorToast.classList.remove('hidden');
+    }
+
+    window.dismissError = function () { errorToast.classList.add('hidden'); };
+
+    function scrollToBottom() {
+      setTimeout(() => {
+        chatContainer.scrollTo({
+          top: chatContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 50);
+    }
+
+    function appendUserMessage(text, imageSrc, audioSrc, modeKey) {
+      const mode = SERVICE_MODES[modeKey] || SERVICE_MODES.consultation;
+      const heroCard = document.getElementById(mode.heroId);
+      if (heroCard) heroCard.classList.add('hidden');
+
+      const activeList = document.getElementById(`messagesList-${modeKey}`) || document.getElementById('messagesList-consultation');
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'flex justify-end';
+
+      let imageHtml = '';
+      if (imageSrc) {
+        imageHtml = `
+          <div class="mb-2 max-w-xs rounded-lg overflow-hidden border border-brand-400/40 shadow-sm">
+            <img src="${imageSrc}" alt="Lampiran Pengguna" class="w-full h-auto max-h-48 object-cover">
+          </div>
+        `;
+      }
+
+      let audioHtml = '';
+      if (audioSrc) {
+        audioHtml = `
+          <div class="mb-2 p-2.5 bg-emerald-700/80 rounded-xl border border-emerald-400/40 flex items-center gap-2.5 shadow-sm">
+            <div class="w-8 h-8 rounded-lg bg-emerald-800 text-amber-300 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-microphone text-xs"></i>
+            </div>
+            <audio controls src="${audioSrc}" class="h-8 max-w-full sm:max-w-xs flex-1"></audio>
+          </div>
+        `;
+      }
+
+      msgDiv.innerHTML = `
+        <div class="max-w-xl bg-gradient-to-br from-brand-600 to-emerald-600 text-white rounded-2xl rounded-tr-none p-4 shadow-md border border-emerald-500/30 space-y-1">
+          ${imageHtml}
+          ${audioHtml}
+          ${text ? `<p class="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</p>` : ''}
+          <div class="text-[10px] text-brand-100 text-right pt-1 flex items-center justify-end gap-1">
+            <span>Anda</span> • <span>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        </div>
+      `;
+
+      activeList.appendChild(msgDiv);
+      scrollToBottom();
+    }
+
+    function appendAiMessage(rawMarkdown, hasImage, hasAudio, modelName, modeKey) {
+      const activeList = document.getElementById(`messagesList-${modeKey}`) || document.getElementById('messagesList-consultation');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'flex items-start space-x-3 max-w-3xl';
+
+      const parsedHtml = marked.parse(rawMarkdown);
+      const uniqueId = 'ai-resp-' + Date.now();
+      const mode = SERVICE_MODES[modeKey] || SERVICE_MODES.consultation;
+
+      msgDiv.innerHTML = `
+        <div class="w-9 h-9 rounded-xl bg-slate-900 dark:bg-slate-800 border border-emerald-500/30 p-1 flex items-center justify-center shadow-sm shrink-0 mt-1">
+          <img src="/logo.png" alt="FarmIQ Specialist" class="w-full h-full object-contain">
+        </div>
+        <div class="flex-1 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl rounded-tl-none p-4 sm:p-5 shadow-md dark:shadow-xl space-y-3 transition-colors duration-200">
+          
+          <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white font-display">FarmIQ Specialist</span>
+              <span class="text-[10px] ${mode.badgeBg} px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-800 font-medium">${mode.title.split(' ')[0]}</span>
+              ${hasImage ? '<span class="text-[10px] bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-700/50"><i class="fa-solid fa-image text-[9px] mr-1"></i>Analisis Citra</span>' : ''}
+              ${hasAudio ? '<span class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700/50"><i class="fa-solid fa-microphone text-[9px] mr-1"></i>Analisis Suara</span>' : ''}
+            </div>
+            
+            <button onclick="copyResponseText('${uniqueId}')" class="text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-1 px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer" title="Salin Jawaban">
+              <i class="fa-regular fa-copy"></i>
+              <span class="hidden sm:inline">Salin</span>
+            </button>
+          </div>
+
+          <div id="${uniqueId}" class="prose-ai">
+            ${parsedHtml}
+          </div>
+
+          <div class="text-[10px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <span>Dihasilkan oleh FarmIQ AI Engine</span>
+            <span>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+
+        </div>
+      `;
+
+      activeList.appendChild(msgDiv);
+      scrollToBottom();
+    }
+
+    window.copyResponseText = function(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText).then(() => {
+        alert('Rekomendasi FarmIQ berhasil disalin ke clipboard!');
+      });
+    };
+
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (isProcessing) return;
+
+      const promptText = promptInput.value.trim();
+      const imageFile = (currentServiceMode === 'diagnosis') ? selectedImageFile : null;
+      const audioFile = recordedAudioFile;
+      const activeMode = currentServiceMode;
+
+      if (!promptText && !imageFile && !audioFile) {
+        showError('Harap ketik pertanyaan, lampirkan foto, atau rekam Voice Note sebelum mengirim.');
+        return;
+      }
+
+      dismissError();
+
+      let imageSrc = null;
+      if (imageFile) {
+        imageSrc = imagePreview.src;
+      }
+
+      let audioSrc = null;
+      if (recordedAudioBlob) {
+        audioSrc = URL.createObjectURL(recordedAudioBlob);
+      }
+
+      appendUserMessage(promptText, imageSrc, audioSrc, activeMode);
+
+      promptInput.value = '';
+      promptInput.style.height = 'auto';
+      clearSelectedImage();
+      clearRecordedAudio();
+
+      isProcessing = true;
+      sendBtn.disabled = true;
+      voiceRecordBtn.disabled = true;
+      loadingIndicator.classList.remove('hidden');
+      scrollToBottom();
+
+      try {
+        const formData = new FormData();
+        
+        let enrichedPrompt = promptText;
+        if (activeMode === 'market' && promptText && !promptText.toLowerCase().includes('harga') && !promptText.toLowerCase().includes('pasar')) {
+          enrichedPrompt = `[Konteks: Analisis Pasar & Komoditas Pertanian] ${promptText}`;
+        } else if (activeMode === 'diagnosis' && !imageFile && !audioFile && promptText) {
+          enrichedPrompt = `[Konteks: Diagnosa Gejala Penyakit / Hama] ${promptText}`;
+        }
+
+        if (enrichedPrompt) {
+          formData.append('prompt', enrichedPrompt);
+        }
+        if (imageFile) {
+          formData.append('image', imageFile);
+        }
+        if (audioFile) {
+          formData.append('audio', audioFile);
+        }
+
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || `Server Error (${res.status})`);
+        }
+
+        appendAiMessage(data.reply, data.hasImage, data.hasAudio, data.model, activeMode);
+
+      } catch (err) {
+        console.error('Chat Submission Error:', err);
+        showError(err.message || 'Gagal mengirim permintaan ke server FarmIQ.');
+      } finally {
+        isProcessing = false;
+        sendBtn.disabled = false;
+        voiceRecordBtn.disabled = false;
+        loadingIndicator.classList.add('hidden');
+      }
+    });
+
+    switchServiceMode(currentServiceMode);
+  </script>
+</body>
+</html>

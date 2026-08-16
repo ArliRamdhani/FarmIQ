@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmIQ Admin Portal 🌾 - Panel Masukan & Feedback Beta</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="shortcut icon" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/logo.png">
+
+  <!-- Immediate Theme Initialization -->
+  <script>
+    (function () {
+      const storedTheme = localStorage.getItem('farmiq_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <!-- Google Fonts & Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-full flex flex-col antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
+
+  <!-- ========================================== -->
+  <!-- 1. LOGIN SCREEN (Visible when logged out)  -->
+  <!-- ========================================== -->
+  <div id="loginScreen" class="flex-1 flex items-center justify-center p-4 min-h-screen">
+    <div class="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+      
+      <!-- Brand Header -->
+      <div class="text-center space-y-3">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-slate-900 dark:bg-slate-800 p-2.5 shadow-xl ring-4 ring-emerald-500/20">
+          <img src="/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
+        </div>
+        <div>
+          <h1 class="font-display font-extrabold text-3xl text-slate-900 dark:text-white tracking-tight">
+            Farm<span class="text-brand-600 dark:text-brand-400">IQ</span> <span class="text-slate-500 dark:text-slate-400 text-2xl font-semibold">Admin</span>
+          </h1>
+          <p class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-1">
+            Asisten Cerdas Pertanian & Ternak
+          </p>
+        </div>
+        <div>
+          <span class="text-xs font-mono font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-700/60 px-3 py-1 rounded-full">PORTAL PENGELOLA</span>
+        </div>
+      </div>
+
+      <!-- Login Alert -->
+      <div id="loginAlert" class="hidden p-3 rounded-xl text-xs flex items-center gap-2 bg-rose-50 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-700/60">
+        <i class="fa-solid fa-circle-exclamation text-rose-500"></i>
+        <span id="loginAlertMsg">Username atau password salah!</span>
+      </div>
+
+      <!-- Form -->
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Username Pengelola</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">
+              <i class="fa-solid fa-user-shield"></i>
+            </span>
+            <input type="text" id="usernameInput" required placeholder="Masukkan username admin" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-800 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Password Keamanan</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">
+              <i class="fa-solid fa-lock"></i>
+            </span>
+            <input type="password" id="passwordInput" required placeholder="••••••••••••" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-800 transition">
+          </div>
+        </div>
+
+        <button type="submit" id="loginBtn" class="w-full py-3 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-semibold text-sm rounded-xl shadow-lg shadow-brand-500/25 transition duration-200 flex items-center justify-center gap-2 cursor-pointer">
+          <span>Buka Panel Feedback</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </form>
+
+      <div class="text-center pt-2">
+        <a href="/" class="text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 inline-flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrow-left text-[10px]"></i>
+          <span>Kembali ke Halaman FarmIQ</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. ADMIN PORTAL (Visible when logged in)   -->
+  <!-- ========================================== -->
+  <div id="adminPortal" class="hidden flex-1 flex flex-col min-h-screen">
+    
+    <!-- Top Navigation Header -->
+    <header class="h-16 px-4 sm:px-8 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-slate-900 dark:bg-slate-800 p-1.5 shadow-md flex items-center justify-center shrink-0 ring-1 ring-emerald-500/30">
+          <img src="/logo.png" alt="FarmIQ" class="w-full h-full object-contain">
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h2 class="font-display font-extrabold text-lg text-slate-900 dark:text-white leading-none">
+              Farm<span class="text-brand-600 dark:text-brand-400">IQ</span> Admin
+            </h2>
+            <span class="bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-700/60 text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">PENGELOLA</span>
+          </div>
+          <p class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 mt-0.5">Asisten Cerdas Pertanian & Ternak</p>
+        </div>
+      </div>
+
+      <!-- Actions on Top Right -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <a href="/" target="_blank" class="p-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          <span class="hidden md:inline">Buka Aplikasi</span>
+        </a>
+
+        <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs transition px-3 shadow-sm cursor-pointer" title="Ganti Tema">
+          <i id="themeIcon" class="fa-solid fa-moon text-amber-500"></i>
+        </button>
+
+        <button onclick="logout()" class="p-2 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 hover:bg-rose-100 dark:hover:bg-rose-900/80 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-700/60 text-xs font-medium transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+          <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          <span>Keluar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+      
+      <!-- STATISTIC METRIC CARDS -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+        
+        <!-- Total Feedbacks -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Masukan</p>
+            <p id="statTotal" class="text-2xl font-bold font-display text-slate-900 dark:text-white mt-1">0</p>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+        </div>
+
+        <!-- Unread Count -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Belum Ditelaah</p>
+            <p id="statUnread" class="text-2xl font-bold font-display text-amber-600 dark:text-amber-400 mt-1">0</p>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </div>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Rating Rata-rata</p>
+            <div class="flex items-center gap-1.5 mt-1">
+              <p id="statRating" class="text-2xl font-bold font-display text-slate-900 dark:text-white">5.0</p>
+              <span class="text-amber-500 text-sm">★</span>
+            </div>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-star"></i>
+          </div>
+        </div>
+
+        <!-- Resolved Count -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Sudah Selesai</p>
+            <p id="statResolved" class="text-2xl font-bold font-display text-sky-600 dark:text-sky-400 mt-1">0</p>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CONTROLS: FILTERS, SEARCH & EXPORT -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          
+          <!-- Category Filter Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5" id="categoryFilterContainer">
+            <button onclick="setFilterCategory('all')" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 text-white shadow-sm transition cursor-pointer" data-cat="all">
+              Semua
+            </button>
+            <button onclick="setFilterCategory('Saran Fitur')" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" data-cat="Saran Fitur">
+              💡 Saran Fitur
+            </button>
+            <button onclick="setFilterCategory('Kualitas Jawaban AI')" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" data-cat="Kualitas Jawaban AI">
+              🤖 Kualitas AI
+            </button>
+            <button onclick="setFilterCategory('Laporan Bug / Error')" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" data-cat="Laporan Bug / Error">
+              🐞 Laporan Bug
+            </button>
+            <button onclick="setFilterCategory('Info Pasar & Cuaca')" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" data-cat="Info Pasar & Cuaca">
+              📈 Pasar & Cuaca
+            </button>
+          </div>
+
+          <!-- Status & Export Actions -->
+          <div class="flex items-center gap-2">
+            <select id="statusFilterSelect" onchange="loadFeedbacks()" class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="all">Status: Semua</option>
+              <option value="unread">Status: Belum Dibaca</option>
+              <option value="reviewed">Status: Ditelaah</option>
+              <option value="resolved">Status: Selesai</option>
+            </select>
+
+            <button onclick="exportToCSV()" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm cursor-pointer" title="Download CSV">
+              <i class="fa-solid fa-file-csv text-sm text-emerald-600"></i>
+              <span>Export CSV</span>
+            </button>
+
+            <button onclick="loadFeedbacks()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs transition cursor-pointer" title="Segarkan Data">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+          <input type="text" id="searchInput" oninput="debounceSearch()" placeholder="Cari berdasarkan nama pengguna, pesan masukan, atau kontak WhatsApp..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+        </div>
+
+      </div>
+
+      <!-- FEEDBACK LIST CONTAINER -->
+      <div id="feedbackList" class="space-y-3"></div>
+
+      <!-- EMPTY STATE -->
+      <div id="emptyState" class="hidden p-12 text-center bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl space-y-3">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-2xl mx-auto">
+          <i class="fa-solid fa-inbox"></i>
+        </div>
+        <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Belum Ada Masukan Pengguna</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Masukan dari form pengguna pada rilis beta akan muncul di panel ini secara real-time.</p>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- JAVASCRIPT CONTROLLER FOR ADMIN PORTAL -->
+  <script>
+    let activeCategory = 'all';
+    let searchDebounceTimer = null;
+    let cachedFeedbacks = [];
+
+    // Theme Engine
+    const themeIcon = document.getElementById('themeIcon');
+    function applyTheme(isDark, save = true) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun text-amber-400';
+        if (save) localStorage.setItem('farmiq_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-moon text-amber-500';
+        if (save) localStorage.setItem('farmiq_theme', 'light');
+      }
+    }
+    function toggleTheme() {
+      applyTheme(!document.documentElement.classList.contains('dark'), true);
+    }
+    applyTheme(document.documentElement.classList.contains('dark'), false);
+
+    // Auth State Check
+    function getAdminToken() {
+      return localStorage.getItem('farmiq_admin_token');
+    }
+
+    async function checkAuth() {
+      const token = getAdminToken();
+      if (!token) {
+        showLogin();
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/verify', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showPortal();
+          loadFeedbacks();
+        } else {
+          showLogin();
+        }
+      } catch {
+        showLogin();
+      }
+    }
+
+    function showLogin() {
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('adminPortal').classList.add('hidden');
+    }
+
+    function showPortal() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('adminPortal').classList.remove('hidden');
+    }
+
+    function logout() {
+      localStorage.removeItem('farmiq_admin_token');
+      showLogin();
+    }
+
+    // Login Submission Handler
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const loginBtn = document.getElementById('loginBtn');
+      const loginAlert = document.getElementById('loginAlert');
+      const loginAlertMsg = document.getElementById('loginAlertMsg');
+
+      loginBtn.disabled = true;
+      loginAlert.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          localStorage.setItem('farmiq_admin_token', data.token);
+          showPortal();
+          loadFeedbacks();
+        } else {
+          loginAlertMsg.textContent = data.error || 'Username atau password salah!';
+          loginAlert.classList.remove('hidden');
+        }
+      } catch (err) {
+        loginAlertMsg.textContent = 'Gagal menghubungi server admin.';
+        loginAlert.classList.remove('hidden');
+      } finally {
+        loginBtn.disabled = false;
+      }
+    });
+
+    // Filter by Category
+    function setFilterCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = 'cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 text-white shadow-sm transition cursor-pointer';
+        } else {
+          btn.className = 'cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer';
+        }
+      });
+      loadFeedbacks();
+    }
+
+    function debounceSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(loadFeedbacks, 300);
+    }
+
+    // Load Feedback Data from API
+    async function loadFeedbacks() {
+      const token = getAdminToken();
+      if (!token) return;
+
+      const status = document.getElementById('statusFilterSelect').value;
+      const search = document.getElementById('searchInput').value.trim();
+
+      const params = new URLSearchParams();
+      if (activeCategory !== 'all') params.append('category', activeCategory);
+      if (status !== 'all') params.append('status', status);
+      if (search) params.append('search', search);
+
+      try {
+        const res = await fetch(`/api/admin/feedback?${params.toString()}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          if (res.status === 401) {
+            logout();
+            return;
+          }
+          throw new Error(data.error);
+        }
+
+        cachedFeedbacks = data.data;
+        renderStats(data.stats);
+        renderFeedbackList(data.data);
+
+      } catch (err) {
+        console.error('Error loading feedback:', err);
+      }
+    }
+
+    function renderStats(stats) {
+      if (!stats) return;
+      document.getElementById('statTotal').textContent = stats.total;
+      document.getElementById('statUnread').textContent = stats.unread;
+      document.getElementById('statRating').textContent = stats.averageRating.toFixed(1);
+      document.getElementById('statResolved').textContent = stats.resolved;
+    }
+
+    function renderFeedbackList(items) {
+      const container = document.getElementById('feedbackList');
+      const emptyState = document.getElementById('emptyState');
+      container.innerHTML = '';
+
+      if (!items || items.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3 transition hover:border-slate-300 dark:hover:border-slate-700';
+
+        // Stars generator
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+          starsHtml += i <= item.rating
+            ? '<span class="text-amber-400 text-xs">★</span>'
+            : '<span class="text-slate-300 dark:text-slate-700 text-xs">★</span>';
+        }
+
+        // Category Badge styling
+        let catBadgeColor = 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
+        if (item.category.includes('Bug')) {
+          catBadgeColor = 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+        } else if (item.category.includes('AI')) {
+          catBadgeColor = 'bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800';
+        } else if (item.category.includes('Pasar')) {
+          catBadgeColor = 'bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800';
+        }
+
+        // Format date
+        const dateObj = new Date(item.created_at);
+        const formattedDate = dateObj.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        // Contact link
+        let contactHtml = '';
+        if (item.contact) {
+          const isPhone = /^[0-9+() -]+$/.test(item.contact);
+          if (isPhone) {
+            const cleanPhone = item.contact.replace(/[^0-9]/g, '');
+            contactHtml = `
+              <a href="https://wa.me/${cleanPhone}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 hover:underline">
+                <i class="fa-brands fa-whatsapp text-xs"></i>
+                <span>${escapeHtml(item.contact)}</span>
+              </a>
+            `;
+          } else {
+            contactHtml = `
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">
+                <i class="fa-solid fa-envelope text-[10px] mr-1"></i>${escapeHtml(item.contact)}
+              </span>
+            `;
+          }
+        }
+
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-bold text-sm text-slate-900 dark:text-white">${escapeHtml(item.name || 'Petani Anonim')}</span>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border ${catBadgeColor}">${escapeHtml(item.category)}</span>
+              <div class="flex items-center gap-0.5">${starsHtml}</div>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+              ${contactHtml}
+              <span>${formattedDate}</span>
+            </div>
+          </div>
+
+          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">${escapeHtml(item.message)}</p>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">Status Penanganan:</span>
+              <select onchange="updateItemStatus(${item.id}, this.value)" class="px-2.5 py-1 rounded-lg text-xs font-semibold ${item.status === 'unread' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' : (item.status === 'reviewed' ? 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300')} border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <option value="unread" ${item.status === 'unread' ? 'selected' : ''}>Belum Dibaca</option>
+                <option value="reviewed" ${item.status === 'reviewed' ? 'selected' : ''}>Ditelaah</option>
+                <option value="resolved" ${item.status === 'resolved' ? 'selected' : ''}>Selesai</option>
+              </select>
+            </div>
+
+            <button onclick="deleteItem(${item.id})" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Hapus Masukan">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function updateItemStatus(id, newStatus) {
+      const token = getAdminToken();
+      try {
+        await fetch(`/api/admin/feedback/${id}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        loadFeedbacks();
+      } catch (err) {
+        console.error('Failed to update status:', err);
+      }
+    }
+
+    async function deleteItem(id) {
+      if (!confirm('Apakah Anda yakin ingin menghapus masukan ini?')) return;
+      const token = getAdminToken();
+      try {
+        await fetch(`/api/admin/feedback/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        loadFeedbacks();
+      } catch (err) {
+        console.error('Failed to delete item:', err);
+      }
+    }
+
+    function exportToCSV() {
+      if (!cachedFeedbacks || cachedFeedbacks.length === 0) {
+        alert('Tidak ada data feedback untuk di-export.');
+        return;
+      }
+
+      const headers = ['ID', 'Nama', 'Kategori', 'Rating', 'Kontak', 'Pesan', 'Status', 'Tanggal'];
+      const rows = cachedFeedbacks.map(f => [
+        f.id,
+        `"${(f.name || '').replace(/"/g, '""')}"`,
+        `"${f.category}"`,
+        f.rating,
+        `"${(f.contact || '').replace(/"/g, '""')}"`,
+        `"${f.message.replace(/"/g, '""')}"`,
+        f.status,
+        f.created_at
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `farmiq_feedback_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Initialize check
+    checkAuth();
+  </script>
+</body>
+</html>
