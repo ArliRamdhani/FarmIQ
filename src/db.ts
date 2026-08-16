@@ -1,4 +1,3 @@
-import Database from 'better-sqlite3';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -12,31 +11,7 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const dbPath = path.join(dataDir, 'farmiq.db');
-const db = new Database(dbPath);
-
-// Enable WAL mode for better concurrency and performance
-db.pragma('journal_mode = WAL');
-
-// Initialize database schema
-db.exec(`
-  CREATE TABLE IF NOT EXISTS feedbacks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    contact TEXT,
-    category TEXT NOT NULL,
-    rating INTEGER NOT NULL DEFAULT 5,
-    message TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'unread',
-    ip_address TEXT,
-    user_agent TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_feedbacks_created_at ON feedbacks(created_at DESC);
-  CREATE INDEX IF NOT EXISTS idx_feedbacks_status ON feedbacks(status);
-  CREATE INDEX IF NOT EXISTS idx_feedbacks_category ON feedbacks(category);
-`);
+const dbFilePath = path.join(dataDir, 'feedbacks.json');
 
 export interface FeedbackInput {
   name?: string;
@@ -71,6 +46,43 @@ export interface FeedbackStats {
   byRating: Record<number, number>;
 }
 
+// In-memory store with atomic disk persistence
+let feedbacksCache: FeedbackRecord[] = [];
+let nextId = 1;
+
+function loadFromDisk(): void {
+  try {
+    if (fs.existsSync(dbFilePath)) {
+      const rawData = fs.readFileSync(dbFilePath, 'utf-8');
+      const parsed = JSON.parse(rawData);
+      if (Array.isArray(parsed)) {
+        feedbacksCache = parsed;
+        const maxId = feedbacksCache.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0);
+        nextId = maxId + 1;
+        return;
+      }
+    }
+  } catch (err) {
+    console.error('Warning: Failed to read feedbacks store, initializing new store:', err);
+  }
+  feedbacksCache = [];
+  nextId = 1;
+  saveToDisk();
+}
+
+function saveToDisk(): void {
+  try {
+    const tempPath = `${dbFilePath}.tmp`;
+    fs.writeFileSync(tempPath, JSON.stringify(feedbacksCache, null, 2), 'utf-8');
+    fs.renameSync(tempPath, dbFilePath);
+  } catch (err) {
+    console.error('Error saving feedbacks to disk:', err);
+  }
+}
+
+// Initialize on startup
+loadFromDisk();
+
 export const dbService = {
   // Insert new feedback from user
   insertFeedback(input: FeedbackInput): FeedbackRecord {
@@ -84,96 +96,103 @@ export const dbService = {
       throw new Error('Pesan masukan tidak boleh kosong.');
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO feedbacks (name, contact, category, rating, message, status, ip_address, user_agent)
-      VALUES (?, ?, ?, ?, ?, 'unread', ?, ?)
-    `);
+    const now = new Date();
+    const formattedDate = now.toISOString().replace('T', ' ').substring(0, 19);
 
-    const result = stmt.run(
-      cleanName,
-      cleanContact,
-      cleanCategory,
-      cleanRating,
-      cleanMessage,
-      input.ip_address || null,
-      input.user_agent || null
-    );
+    const newRecord: FeedbackRecord = {
+      id: nextId++,
+      name: cleanName,
+      contact: cleanContact,
+      category: cleanCategory,
+      rating: cleanRating,
+      message: cleanMessage,
+      status: 'unread',
+      ip_address: input.ip_address || null,
+      user_agent: input.user_agent || null,
+      created_at: formattedDate
+    };
 
-    const insertedId = Number(result.lastInsertRowid);
-    const created = db.prepare('SELECT * FROM feedbacks WHERE id = ?').get(insertedId) as unknown as FeedbackRecord;
-    return created;
+    feedbacksCache.unshift(newRecord);
+    saveToDisk();
+
+    return newRecord;
   },
 
   // Get all feedbacks with optional filters
   getAllFeedbacks(options?: { status?: string; category?: string; search?: string }): FeedbackRecord[] {
-    let sql = 'SELECT * FROM feedbacks WHERE 1=1';
-    const params: (string | number)[] = [];
+    let result = [...feedbacksCache];
 
     if (options?.status && options.status !== 'all') {
-      sql += ' AND status = ?';
-      params.push(options.status);
+      result = result.filter(f => f.status === options.status);
     }
 
     if (options?.category && options.category !== 'all') {
-      sql += ' AND category = ?';
-      params.push(options.category);
+      result = result.filter(f => f.category === options.category);
     }
 
     if (options?.search && options.search.trim()) {
-      sql += ' AND (name LIKE ? OR message LIKE ? OR contact LIKE ?)';
-      const term = `%${options.search.trim()}%`;
-      params.push(term, term, term);
+      const term = options.search.trim().toLowerCase();
+      result = result.filter(f =>
+        (f.name && f.name.toLowerCase().includes(term)) ||
+        (f.message && f.message.toLowerCase().includes(term)) ||
+        (f.contact && f.contact.toLowerCase().includes(term))
+      );
     }
 
-    sql += ' ORDER BY created_at DESC';
-
-    const stmt = db.prepare(sql);
-    return stmt.all(...params) as unknown as FeedbackRecord[];
+    return result;
   },
 
   // Update status (unread, reviewed, resolved)
   updateStatus(id: number, status: 'unread' | 'reviewed' | 'resolved'): boolean {
-    const stmt = db.prepare('UPDATE feedbacks SET status = ? WHERE id = ?');
-    const result = stmt.run(status, id);
-    return Number(result.changes) > 0;
+    const index = feedbacksCache.findIndex(f => f.id === id);
+    if (index !== -1) {
+      feedbacksCache[index].status = status;
+      saveToDisk();
+      return true;
+    }
+    return false;
   },
 
   // Delete feedback
   deleteFeedback(id: number): boolean {
-    const stmt = db.prepare('DELETE FROM feedbacks WHERE id = ?');
-    const result = stmt.run(id);
-    return Number(result.changes) > 0;
+    const initialLen = feedbacksCache.length;
+    feedbacksCache = feedbacksCache.filter(f => f.id !== id);
+    if (feedbacksCache.length !== initialLen) {
+      saveToDisk();
+      return true;
+    }
+    return false;
   },
 
   // Get feedback statistics for dashboard overview
   getStats(): FeedbackStats {
-    const totalRow = (db.prepare('SELECT COUNT(*) as count, AVG(rating) as avgRating FROM feedbacks').get() || {}) as { count?: number; avgRating?: number | null };
-    const unreadRow = (db.prepare("SELECT COUNT(*) as count FROM feedbacks WHERE status = 'unread'").get() || {}) as { count?: number };
-    const reviewedRow = (db.prepare("SELECT COUNT(*) as count FROM feedbacks WHERE status = 'reviewed'").get() || {}) as { count?: number };
-    const resolvedRow = (db.prepare("SELECT COUNT(*) as count FROM feedbacks WHERE status = 'resolved'").get() || {}) as { count?: number };
-
-    const categoryRows = (db.prepare('SELECT category, COUNT(*) as count FROM feedbacks GROUP BY category').all() || []) as unknown as Array<{ category: string; count: number }>;
-    const ratingRows = (db.prepare('SELECT rating, COUNT(*) as count FROM feedbacks GROUP BY rating').all() || []) as unknown as Array<{ rating: number; count: number }>;
+    const total = feedbacksCache.length;
+    let unread = 0;
+    let reviewed = 0;
+    let resolved = 0;
+    let ratingSum = 0;
 
     const byCategory: Record<string, number> = {};
-    categoryRows.forEach(row => {
-      byCategory[row.category] = Number(row.count);
-    });
-
     const byRating: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    ratingRows.forEach(row => {
-      byRating[Number(row.rating)] = Number(row.count);
+
+    feedbacksCache.forEach(f => {
+      if (f.status === 'unread') unread++;
+      else if (f.status === 'reviewed') reviewed++;
+      else if (f.status === 'resolved') resolved++;
+
+      ratingSum += f.rating;
+      byRating[f.rating] = (byRating[f.rating] || 0) + 1;
+      byCategory[f.category] = (byCategory[f.category] || 0) + 1;
     });
 
-    const totalCount = Number(totalRow.count || 0);
-    const avgRatingVal = totalRow.avgRating !== undefined && totalRow.avgRating !== null ? Number(Number(totalRow.avgRating).toFixed(2)) : 5.0;
+    const averageRating = total > 0 ? Number((ratingSum / total).toFixed(2)) : 5.0;
 
     return {
-      total: totalCount,
-      unread: Number(unreadRow.count || 0),
-      reviewed: Number(reviewedRow.count || 0),
-      resolved: Number(resolvedRow.count || 0),
-      averageRating: avgRatingVal,
+      total,
+      unread,
+      reviewed,
+      resolved,
+      averageRating,
       byCategory,
       byRating
     };

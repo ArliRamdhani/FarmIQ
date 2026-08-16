@@ -14,7 +14,7 @@ Didukung oleh **Google Gemini REST API**, FarmIQ mampu memproses teks pertanyaan
 * **📈 Update Harga Pasar Komoditas:** Pantauan harga acuan komoditas pangan harian, proyeksi tren panen, info cuaca agroklimatologi lokal, dan mekanisme subsidi pupuk e-RDKK.
 * **🎙️ Rekaman Suara Langsung / Voice Note:** Fitur rekam mikrofon langsung di semua mode layanan (*tanpa repot upload file audio*), dilengkapi penghitung durasi dan pemutar audio pratinjau.
 * **🗂️ Ruang Obrolan Terpisah (*Multi-Tab Chat Sessions*):** Setiap mode layanan (*Konsultasi*, *Check Kesehatan*, dan *Update Pasar*) memiliki ruang dan riwayat percakapan independen.
-* **💬 Formulir Masukan Pengguna (User Feedback):** Fitur interaktif bagi pengguna untuk memberikan rating (1–5 bintang), kritik, dan saran pengembangan aplikasi yang disimpan ke database SQLite lokal.
+* **💬 Formulir Masukan Pengguna (User Feedback):** Fitur interaktif bagi pengguna untuk memberikan rating (1–5 bintang), kritik, dan saran pengembangan aplikasi yang disimpan aman pada penyimpanan lokal (`data/feedbacks.json`).
 * **🔒 Portal Admin Khusus Pengelola (`/admin`):** Dashboard manajemen umpan balik bagi developer/owner yang dilindungi otentikasi token bertanda tangan **HMAC SHA-256**, dilengkapi statistik real-time, filter status, pencarian, tautan cepat WhatsApp, dan ekspor CSV.
 * **🌓 Mode Tampilan Gelap & Terang:** Antarmuka modern yang nyaman digunakan baik di bawah terik matahari maupun malam hari.
 
@@ -24,7 +24,7 @@ Didukung oleh **Google Gemini REST API**, FarmIQ mampu memproses teks pertanyaan
 
 * **Backend:** Node.js, Express.js 5, TypeScript (`strict: true`)
 * **AI Engine:** Google Gemini REST API (`generateContent`)
-* **Database:** SQLite via `better-sqlite3` (Performa tinggi dengan mode WAL)
+* **Database / Data Store:** Atomic Persistent Storage (`data/feedbacks.json`) dengan caching in-memory
 * **Authentication:** HMAC SHA-256 Signed Session Tokens (Masa berlaku 7 hari)
 * **File Processing:** Multer (Pengolahan buffer in-memory tanpa penyimpanan lokal ke disk)
 * **Frontend:** Single Page HTML5, Tailwind CSS, Vanilla JavaScript, Marked.js, Highlight.js, Font Awesome
@@ -48,11 +48,11 @@ FarmIQ/
 ├── PROJECT_RULES.md      # Standar dan aturan arsitektur proyek
 ├── README.md             # Dokumentasi lengkap proyek
 ├── package.json          # Dependency & build scripts
-├── data/                 # Penyimpanan SQLite Database (diabaikan git)
-│   └── farmiq.db
+├── data/                 # Penyimpanan data masukan pengguna (diabaikan git)
+│   └── feedbacks.json
 ├── src/
 │   ├── server.ts         # Server backend Express, routing, keamanan & AI
-│   └── db.ts             # Layer database SQLite (CRUD Feedback & Statistik)
+│   └── db.ts             # Data store layer (CRUD Feedback & Statistik)
 ├── public/
 │   ├── index.html        # Frontend dashboard antarmuka pengguna FarmIQ
 │   ├── admin.html        # Portal admin pengelola feedback pengguna
@@ -290,12 +290,12 @@ Aplikasi FarmIQ dapat dipublikasikan ke internet secara gratis menggunakan layan
    - **Instance Type:** `Free`
 4. **Atur Environment Variables (Environment Secrets):**
    - Gulir ke bagian **Environment Variables** lalu tambahkan:
-     - `NODE_VERSION` = `22.5.0` (atau `22`)
      - `GEMINI_API_KEY` = `<API_KEY_GEMINI_ANDA>`
      - `GEMINI_MODEL` = `gemini-3.5-flash-lite`
      - `ADMIN_USERNAME` = `<username_admin_anda>` (contoh: `admin`)
      - `ADMIN_PASSWORD` = `<password_rahasia_anda>`
      - `ADMIN_SESSION_SECRET` = `<string_acak_panjang_untuk_keamanan_token>`
+   *(Catatan: Anda tidak perlu mengatur versi Node khusus karena aplikasi kompatibel dengan semua versi Node.js LTS default seperti Node 18, 20, dan 22).*
 5. **Klik "Deploy Web Service":**
    - Tunggu proses build & deploy selesai (~2 menit).
    - Render akan memberikan URL publik dengan HTTPS otomatis (misalnya: `https://farmiq.onrender.com`).
@@ -312,7 +312,7 @@ Aplikasi FarmIQ dapat dipublikasikan ke internet secara gratis menggunakan layan
 ---
 
 ### 💡 Tips & Catatan Produksi:
-* **Penyimpanan Database SQLite di Free Tier:** Database SQLite (`data/farmiq.db`) berjalan lokal di dalam container. Pada paket gratis Render/Railway, data masukan (*feedback*) dapat diunduh kapan saja dalam format spreadsheet melalui tombol **Ekspor CSV** di portal admin (`https://<domain-anda>/admin`).
+* **Penyimpanan Data di Free Tier:** Data masukan pengguna tersimpan lokal di dalam container (`data/feedbacks.json`). Pada paket gratis Render/Railway, data masukan (*feedback*) dapat diunduh kapan saja dalam format spreadsheet melalui tombol **Ekspor CSV** di portal admin (`https://<domain-anda>/admin`).
 * **Ketersediaan Gemini API:** Dapatkan API Key gratis di [Google AI Studio](https://aistudio.google.com/).
 
 ---

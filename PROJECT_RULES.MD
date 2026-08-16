@@ -3,7 +3,7 @@
 ## Tech Stack
 - **Language:** TypeScript (`strict: true`, ES Modules)
 - **Backend:** Node.js, Express.js 5
-- **Database:** SQLite via `better-sqlite3` (High-performance synchronous storage with WAL mode)
+- **Database / Data Store:** Atomic Persistent File Storage (`data/feedbacks.json`) with in-memory caching and instant zero-dependency cloud compatibility
 - **Authentication:** HMAC SHA-256 Signed Session Tokens for Owner/Admin access
 - **File Handling:** Multer (In-Memory Buffer Storage for Images & Live Mic Voice Notes)
 - **AI Integration:** Google Gemini REST API (`generativelanguage.googleapis.com`)
@@ -15,7 +15,7 @@
 - Definisikan `interface` atau `type` eksplisit untuk Request Body, File Upload (Multer), Feedback Record, dan Struktur Payload/Response Gemini API.
 - Jangan simpan file gambar atau rekaman suara ke disk lokal; olah `file.buffer` langsung menjadi string Base64 (`inlineData`) untuk dikirim ke Gemini.
 - Selalu sertakan `systemInstruction` pada payload Gemini dengan persona "FarmIQ Specialist".
-- Data persistensi masukan pengguna (feedback) disimpan di database SQLite `data/farmiq.db` dengan WAL mode.
+- Data persistensi masukan pengguna (feedback) disimpan secara aman di `data/feedbacks.json`.
 - Gunakan `tsx` untuk eksekusi file `.ts` saat pengembangan (*hot-reloading*).
 
 ## Project Directory Blueprint
