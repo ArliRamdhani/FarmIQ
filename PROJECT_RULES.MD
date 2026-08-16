@@ -3,7 +3,7 @@
 ## Tech Stack
 - **Language:** TypeScript (`strict: true`, ES Modules)
 - **Backend:** Node.js, Express.js 5
-- **Database:** SQLite via Node.js Native Module (`node:sqlite` DatabaseSync with WAL mode)
+- **Database:** SQLite via `better-sqlite3` (High-performance synchronous storage with WAL mode)
 - **Authentication:** HMAC SHA-256 Signed Session Tokens for Owner/Admin access
 - **File Handling:** Multer (In-Memory Buffer Storage for Images & Live Mic Voice Notes)
 - **AI Integration:** Google Gemini REST API (`generativelanguage.googleapis.com`)

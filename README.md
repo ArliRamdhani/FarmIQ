@@ -24,7 +24,7 @@ Didukung oleh **Google Gemini REST API**, FarmIQ mampu memproses teks pertanyaan
 
 * **Backend:** Node.js, Express.js 5, TypeScript (`strict: true`)
 * **AI Engine:** Google Gemini REST API (`generateContent`)
-* **Database:** SQLite via modul bawaan Node.js (`node:sqlite` DatabaseSync dengan mode WAL)
+* **Database:** SQLite via `better-sqlite3` (Performa tinggi dengan mode WAL)
 * **Authentication:** HMAC SHA-256 Signed Session Tokens (Masa berlaku 7 hari)
 * **File Processing:** Multer (Pengolahan buffer in-memory tanpa penyimpanan lokal ke disk)
 * **Frontend:** Single Page HTML5, Tailwind CSS, Vanilla JavaScript, Marked.js, Highlight.js, Font Awesome

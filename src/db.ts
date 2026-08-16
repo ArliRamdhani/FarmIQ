@@ -1,4 +1,4 @@
-import { DatabaseSync } from 'node:sqlite';
+import Database from 'better-sqlite3';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -13,10 +13,10 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const dbPath = path.join(dataDir, 'farmiq.db');
-const db = new DatabaseSync(dbPath);
+const db = new Database(dbPath);
 
 // Enable WAL mode for better concurrency and performance
-db.exec('PRAGMA journal_mode = WAL;');
+db.pragma('journal_mode = WAL');
 
 // Initialize database schema
 db.exec(`
