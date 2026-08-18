@@ -2057,11 +2057,34 @@
     let isProcessing = false;
 
     // Multi-turn Chat Conversation Memory per Service Mode
-    const chatHistories = {
+    let chatHistories = {
       consultation: [],
       diagnosis: [],
       market: []
     };
+
+    function saveChatHistories() {
+      try {
+        localStorage.setItem('farmiq_chat_histories', JSON.stringify(chatHistories));
+      } catch (e) {
+        console.warn('Failed to save chatHistories to localStorage:', e);
+      }
+    }
+
+    function saveRenderedMessage(modeKey, msgObj) {
+      try {
+        let stored = localStorage.getItem('farmiq_rendered_messages');
+        let parsed = stored ? JSON.parse(stored) : { consultation: [], diagnosis: [], market: [] };
+        if (!parsed[modeKey]) parsed[modeKey] = [];
+        parsed[modeKey].push(msgObj);
+        if (parsed[modeKey].length > 30) {
+          parsed[modeKey] = parsed[modeKey].slice(-30);
+        }
+        localStorage.setItem('farmiq_rendered_messages', JSON.stringify(parsed));
+      } catch (e) {
+        console.warn('Failed to save rendered message to localStorage:', e);
+      }
+    }
 
     // DOM Elements
     const chatContainer = document.getElementById('chatContainer');
@@ -2307,6 +2330,21 @@
       if (chatHistories[currentServiceMode]) {
         chatHistories[currentServiceMode] = [];
       }
+      saveChatHistories();
+
+      try {
+        let stored = localStorage.getItem('farmiq_rendered_messages');
+        if (stored) {
+          let parsed = JSON.parse(stored);
+          if (parsed && parsed[currentServiceMode]) {
+            parsed[currentServiceMode] = [];
+            localStorage.setItem('farmiq_rendered_messages', JSON.stringify(parsed));
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to reset rendered messages for mode:', e);
+      }
+
       const activeList = document.getElementById(`messagesList-${currentServiceMode}`);
       if (activeList) activeList.innerHTML = '';
 
@@ -2347,7 +2385,7 @@
       }, 50);
     }
 
-    function appendUserMessage(text, imageSrc, audioSrc, modeKey) {
+    function renderUserMessage(text, imageSrc, hasAudio, audioSrc, modeKey, timeStr) {
       const mode = SERVICE_MODES[modeKey] || SERVICE_MODES.consultation;
       const heroCard = document.getElementById(mode.heroId);
       if (heroCard) heroCard.classList.add('hidden');
@@ -2376,7 +2414,16 @@
             <audio controls src="${audioSrc}" class="h-8 max-w-full sm:max-w-xs flex-1"></audio>
           </div>
         `;
+      } else if (hasAudio) {
+        audioHtml = `
+          <div class="mb-2 p-2 bg-emerald-700/60 rounded-xl border border-emerald-400/30 flex items-center gap-2 text-xs">
+            <i class="fa-solid fa-microphone text-amber-300"></i>
+            <span class="text-[11px] text-emerald-100 font-medium">Voice Note Terkirim</span>
+          </div>
+        `;
       }
+
+      const displayTime = timeStr || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       msgDiv.innerHTML = `
         <div class="max-w-xl bg-gradient-to-br from-brand-600 to-emerald-600 text-white rounded-2xl rounded-tr-none p-4 shadow-md border border-emerald-500/30 space-y-1">
@@ -2384,23 +2431,26 @@
           ${audioHtml}
           ${text ? `<p class="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</p>` : ''}
           <div class="text-[10px] text-brand-100 text-right pt-1 flex items-center justify-end gap-1">
-            <span>Anda</span> • <span>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span>Anda</span> • <span>${displayTime}</span>
           </div>
         </div>
       `;
 
       activeList.appendChild(msgDiv);
-      scrollToBottom();
     }
 
-    function appendAiMessage(rawMarkdown, hasImage, hasAudio, modelName, modeKey) {
+    function renderAiMessage(rawMarkdown, hasImage, hasAudio, modelName, modeKey, timeStr) {
+      const mode = SERVICE_MODES[modeKey] || SERVICE_MODES.consultation;
+      const heroCard = document.getElementById(mode.heroId);
+      if (heroCard) heroCard.classList.add('hidden');
+
       const activeList = document.getElementById(`messagesList-${modeKey}`) || document.getElementById('messagesList-consultation');
       const msgDiv = document.createElement('div');
       msgDiv.className = 'flex items-start space-x-3 max-w-3xl';
 
       const parsedHtml = marked.parse(rawMarkdown);
-      const uniqueId = 'ai-resp-' + Date.now();
-      const mode = SERVICE_MODES[modeKey] || SERVICE_MODES.consultation;
+      const uniqueId = 'ai-resp-' + Math.random().toString(36).substring(2, 9);
+      const displayTime = timeStr || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       msgDiv.innerHTML = `
         <div class="w-9 h-9 flex items-center justify-center shrink-0 mt-1">
@@ -2428,14 +2478,77 @@
 
           <div class="text-[10px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <span>Dihasilkan oleh FarmIQ AI Engine</span>
-            <span>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span>${displayTime}</span>
           </div>
 
         </div>
       `;
 
       activeList.appendChild(msgDiv);
+    }
+
+    function appendUserMessage(text, imageSrc, audioSrc, modeKey) {
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      renderUserMessage(text, imageSrc, !!audioSrc, audioSrc, modeKey, timeStr);
+      saveRenderedMessage(modeKey, {
+        type: 'user',
+        text: text || '',
+        imageSrc: (imageSrc && imageSrc.startsWith('data:') ? imageSrc : null),
+        hasAudio: !!audioSrc,
+        time: timeStr
+      });
       scrollToBottom();
+    }
+
+    function appendAiMessage(rawMarkdown, hasImage, hasAudio, modelName, modeKey) {
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      renderAiMessage(rawMarkdown, hasImage, hasAudio, modelName, modeKey, timeStr);
+      saveRenderedMessage(modeKey, {
+        type: 'ai',
+        rawMarkdown,
+        hasImage: !!hasImage,
+        hasAudio: !!hasAudio,
+        modelName: modelName || 'gemini-3.5-flash-lite',
+        time: timeStr
+      });
+      scrollToBottom();
+    }
+
+    function loadPersistedChatData() {
+      try {
+        const savedHistories = localStorage.getItem('farmiq_chat_histories');
+        if (savedHistories) {
+          const parsed = JSON.parse(savedHistories);
+          if (parsed && typeof parsed === 'object') {
+            chatHistories = {
+              consultation: Array.isArray(parsed.consultation) ? parsed.consultation : [],
+              diagnosis: Array.isArray(parsed.diagnosis) ? parsed.diagnosis : [],
+              market: Array.isArray(parsed.market) ? parsed.market : []
+            };
+          }
+        }
+
+        const savedRendered = localStorage.getItem('farmiq_rendered_messages');
+        if (savedRendered) {
+          const parsed = JSON.parse(savedRendered);
+          if (parsed && typeof parsed === 'object') {
+            ['consultation', 'diagnosis', 'market'].forEach(modeKey => {
+              const msgs = parsed[modeKey];
+              if (Array.isArray(msgs) && msgs.length > 0) {
+                msgs.forEach(m => {
+                  if (m.type === 'user') {
+                    renderUserMessage(m.text, m.imageSrc, m.hasAudio, null, modeKey, m.time);
+                  } else if (m.type === 'ai') {
+                    renderAiMessage(m.rawMarkdown, m.hasImage, m.hasAudio, m.modelName, modeKey, m.time);
+                  }
+                });
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load persisted chat messages from localStorage:', err);
+      }
     }
 
     window.copyResponseText = function(id) {
@@ -2638,6 +2751,7 @@
           role: 'model',
           text: data.reply
         });
+        saveChatHistories();
 
         appendAiMessage(data.reply, data.hasImage, data.hasAudio, data.model, activeMode);
 
@@ -2652,6 +2766,7 @@
       }
     });
 
+    loadPersistedChatData();
     switchServiceMode(currentServiceMode);
     updateQuotaUI();
   </script>

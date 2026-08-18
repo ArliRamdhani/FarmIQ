@@ -33,6 +33,7 @@ Ketika merilis versi baru, tambahkan bagian baru di bawah judul berkas dengan fo
   - Penyimpanan riwayat obrolan independen untuk masing-masing tab mode layanan (`consultation`, `diagnosis`, `market`).
   - Pengiriman riwayat obrolan secara otomatis ke Gemini API dengan pembatasan jendela geser (*sliding window*) 10 pertukaran terakhir untuk efisiensi token.
   - Aturan *Greeting Suppression*: Salam pembuka hanya muncul pada pesan pertama; pesan lanjutan langsung dijawab secara to-the-point tanpa perkenalan berulang.
+  - **Penyimpanan Chat Lokal (*Local Chat Persistence*):** Pesan obrolan dan jawaban AI tersimpan otomatis di `localStorage` peramban sehingga riwayat obrolan tidak hilang saat halaman di-*refresh* atau dibuka kembali. Fitur tombol Reset akan mengosongkan riwayat secara bersih.
 * **Portabilitas Data Feedback (Ekspor & Impor JSON & CSV):**
   - Tombol **Ekspor JSON** dan **Ekspor CSV** di Portal Admin `/admin` untuk mencadangkan data masukan pengguna.
   - Fitur **Impor Data Feedback** (JSON & CSV) dengan opsi penggabungan (*Merge*) atau penimpaan (*Replace*) serta validasi baris real-time.
