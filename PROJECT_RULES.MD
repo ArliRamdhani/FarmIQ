@@ -53,6 +53,8 @@ FarmIQ/
 - `POST /api/admin/login` — Autentikasi admin pengelola dengan username & password.
 - `GET /api/admin/verify` — Verifikasi validitas token sesi admin.
 - `GET /api/admin/feedback` — Mengambil daftar masukan pengguna dan agregasi statistik rating.
+- `GET /api/admin/feedback/export` — Mengunduh backup data feedback dalam format JSON atau CSV.
+- `POST /api/admin/feedback/import` — Memulihkan atau menggabungkan data feedback dari berkas JSON / CSV.
 - `PATCH /api/admin/feedback/:id/status` — Memperbarui status masukan (`unread`, `reviewed`, `resolved`).
 - `DELETE /api/admin/feedback/:id` — Menghapus data masukan pengguna.
 - `GET /admin` — Menyajikan halaman web portal pengelola (`public/admin.html`).

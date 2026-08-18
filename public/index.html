@@ -484,6 +484,21 @@
 
     </header>
 
+    <!-- MOBILE ACTIVE SERVICE MODE BAR (Sticky on Mobile/Tablet < md) -->
+    <div id="mobileModeBar" class="md:hidden px-4 py-2 bg-white/95 dark:bg-slate-900/95 border-b border-slate-200/80 dark:border-slate-800 backdrop-blur-md flex items-center justify-between z-10 shrink-0 shadow-xs">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider shrink-0">Mode:</span>
+        <button type="button" onclick="openSidebar()" id="mobileActiveModeBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow-xs transition-all cursor-pointer truncate" title="Klik untuk beralih mode layanan">
+          <i id="mobileActiveModeIcon" class="fa-solid fa-comments text-[10px]"></i>
+          <span id="mobileActiveModeTitle" class="truncate">Konsultasi Umum Agronomi</span>
+        </button>
+      </div>
+      <button type="button" onclick="openSidebar()" class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 shrink-0 cursor-pointer ml-2" title="Buka menu ganti mode">
+        <span>Ganti</span>
+        <i class="fa-solid fa-chevron-right text-[9px]"></i>
+      </button>
+    </div>
+
     <!-- MAIN CHAT & DASHBOARD VIEW CONTAINER -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col space-y-6 max-w-5xl w-full mx-auto" id="chatContainer">
       
@@ -500,9 +515,8 @@
             <img src="/assets/images/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
           </div>
           <div class="flex-1 space-y-2">
-            <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
               <h3 class="text-lg sm:text-xl font-display font-bold text-slate-900 dark:text-white">Konsultasi Pertanian & Peternakan Terpadu 🌿</h3>
-              <span class="text-xs bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full font-medium">Mode Konsultasi</span>
             </div>
             <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Diskusikan strategi bercocok tanam, kalkulasi pemupukan berimbang (NPK/Urea/Organik), irigasi, dan formulasi pakan ternak langsung dengan asisten cerdas FarmIQ.
@@ -611,9 +625,8 @@
             <img src="/assets/images/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
           </div>
           <div class="flex-1 space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
               <h3 class="text-lg sm:text-xl font-display font-bold text-slate-900 dark:text-white">Check Kesehatan & Diagnosa AI 🩺</h3>
-              <span class="text-xs bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 px-2.5 py-0.5 rounded-full font-medium">Foto & Visual Ready</span>
             </div>
             <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Unggah foto daun bergejala, bercak batang, hama tanaman, atau kondisi fisik ternak yang sakit. AI akan mendiagnosa patogen penyebab, menentukan tingkat keparahan, dan merekomendasikan solusi penanganan terarah.
@@ -667,9 +680,8 @@
                 <img src="/assets/images/logo.png" alt="FarmIQ Logo" class="w-full h-full object-contain">
               </div>
               <div>
-                <div class="flex items-center space-x-2">
+                <div>
                   <h3 class="text-lg sm:text-xl font-display font-bold text-slate-900 dark:text-white">Update Harga Pasar & Info Komoditas 📈</h3>
-                  <span class="text-[11px] bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60 px-2 py-0.5 rounded-full font-medium">Hari Ini</span>
                 </div>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Rata-rata harga acuan komoditas pangan nasional (Pusat Informasi Harga Pangan)</p>
               </div>
@@ -921,12 +933,17 @@
 
           </div>
           
-          <!-- FOOTER TIP & ACTIVE MODE INDICATOR -->
-          <div class="flex items-center text-[11px] text-slate-500 dark:text-slate-400 px-1 pt-0.5">
-            <div class="flex items-center gap-1.5 truncate w-full">
+          <!-- FOOTER TIP & ACTIVE MODE INDICATOR + DAILY QUOTA BADGE -->
+          <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-1 pt-0.5 gap-2">
+            <div class="flex items-center gap-1.5 truncate min-w-0">
               <i class="fa-solid fa-circle-info text-emerald-600 dark:text-emerald-400 shrink-0"></i>
               <span id="inputTipText" class="truncate">Mode <strong>Konsultasi Umum</strong> aktif. Tekan <strong>Enter</strong> atau rekam Voice Note.</span>
             </div>
+            <!-- Daily Quota Pill -->
+            <button type="button" onclick="openQuotaInfoModal()" id="quotaBadgeContainer" class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-xs hover:border-emerald-400 transition cursor-pointer" title="Klik untuk informasi batas kuota gratis harian">
+              <i class="fa-solid fa-bolt text-amber-500 text-[9px]"></i>
+              <span>Sisa: <strong id="quotaRemainingText" class="text-slate-800 dark:text-slate-100">15/15</strong></span>
+            </button>
           </div>
 
           <!-- AI DISCLAIMER NOTE (Responsive & Space-Efficient) -->
@@ -1262,9 +1279,7 @@
           <span>Sebelumnya</span>
         </button>
 
-        <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">
-          Gunakan panah &larr; &rarr; untuk navigasi
-        </span>
+        <div class="flex-1"></div>
 
         <button
           id="welcomeNextBtn"
@@ -1412,7 +1427,7 @@
           </div>
           <div class="inline-flex items-center justify-center">
             <span class="text-[11px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-mono font-bold px-3 py-0.5 rounded-full shadow-sm">
-              v1.0.0
+              v1.1.0
             </span>
           </div>
         </div>
@@ -1488,6 +1503,45 @@
   </div>
 
   <!-- ========================================== -->
+  <!-- 3. DAILY QUOTA LIMIT MODAL DIALOG         -->
+  <!-- ========================================== -->
+  <div id="quotaExceededModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+      
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl mx-auto shadow-md">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Batas Kuota Harian Tercapai 🌾</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+          Anda telah menggunakan seluruh <strong>15 kuota chat gratis</strong> untuk hari ini. Kuota harian Anda akan otomatis di-reset menjadi 15 setiap pukul <strong>00:00 WIB</strong>.
+        </p>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl space-y-2 text-xs text-slate-600 dark:text-slate-300">
+        <p class="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+          <i class="fa-solid fa-lightbulb text-amber-500"></i>
+          Butuh Kuota Tambahan atau Ada Saran?
+        </p>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
+          Kami sedang mengembangkan paket intensif untuk petani & peternak. Kirimkan masukan Anda agar tim pengembang dapat menyediakan kuota khusus atau paket lanjutan.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2 pt-1">
+        <button type="button" onclick="closeQuotaModalAndOpenFeedback()" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer">
+          <i class="fa-solid fa-comment-dots text-xs"></i>
+          <span>Kirim Masukan / Request Kuota</span>
+        </button>
+        <button type="button" onclick="closeQuotaModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition cursor-pointer">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
   <!-- JAVASCRIPT CONTROLLER & LOGIC              -->
   <!-- ========================================== -->
   <script>
@@ -1499,23 +1553,27 @@
     const SERVICE_MODES = {
       consultation: {
         title: 'Konsultasi Umum Agronomi',
-        desc: 'Tanya jawab seputar teknik bertani, dosis pemupukan berimbang, panduan pemula & peternakan',
+        shortTitle: 'Konsultasi',
+        desc: 'Tanya jawab seputar teknik bertani, dosis pemupukan berimbang & peternakan',
         icon: 'fa-comments',
         badgeBg: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400',
+        pillClass: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
         heroId: 'hero-consultation',
-        placeholder: 'Ketik pertanyaan budidaya, dosis pupuk, atau rekam Voice Note...',
-        tip: 'Mode <strong>Konsultasi Umum</strong> aktif. Tekan <strong>Enter</strong> atau klik mikrofon untuk Voice Note.',
+        placeholder: 'Tanyakan teknik bertani, dosis pupuk, atau rekam Voice Note...',
+        tip: 'Mode <strong>Konsultasi Umum</strong> aktif. Tanyakan teknik budidaya, dosis pupuk, atau rekam suara langsung.',
         activeBtn: 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500/60 dark:border-emerald-500/60 text-emerald-950 dark:text-emerald-200 shadow-sm',
-        activeIcon: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300/40 dark:border-emerald-500/30',
+        activeIcon: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-300/40 dark:border-emerald-500/30',
         activeTitle: 'text-slate-900 dark:text-white font-bold',
         activeDesc: 'text-emerald-800/90 dark:text-emerald-300/80',
         inactiveIconHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40'
       },
       diagnosis: {
-        title: 'Check Kesehatan',
-        desc: 'Diagnosa foto penyakit tanaman, hama, defisiensi hara & kesehatan hewan ternak',
+        title: 'Check Kesehatan & Diagnosa AI',
+        shortTitle: 'Check Kesehatan',
+        desc: 'Deteksi dini patogen tanaman (jamur/bakteri/hama) & penyakit ternak dari foto',
         icon: 'fa-stethoscope',
         badgeBg: 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400',
+        pillClass: 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700',
         heroId: 'hero-diagnosis',
         placeholder: 'Ketik gejala, rekam Voice Note, atau lampirkan foto...',
         tip: 'Mode <strong>Check Kesehatan</strong> aktif. Lampirkan foto gejala atau rekam suara penjelasan.',
@@ -1527,9 +1585,11 @@
       },
       market: {
         title: 'Update Informasi & Pasar Komoditas',
+        shortTitle: 'Update Pasar',
         desc: 'Pantauan harga komoditas pangan harian, tren pasar agribisnis & info regulasi',
         icon: 'fa-chart-line',
         badgeBg: 'bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400',
+        pillClass: 'bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-700',
         heroId: 'hero-market',
         placeholder: 'Tanyakan tren harga komoditas atau rekam Voice Note...',
         tip: 'Mode <strong>Update Pasar</strong> aktif. Tanyakan komoditas atau gunakan mikrofon untuk Voice Note.',
@@ -1548,11 +1608,25 @@
 
       const mode = SERVICE_MODES[modeKey];
 
-      // Update Header Text & Icons
-      document.getElementById('activeModeTitle').textContent = mode.title;
-      document.getElementById('activeModeDesc').textContent = mode.desc;
-      document.getElementById('activeModeIcon').className = 'fa-solid ' + mode.icon;
-      document.getElementById('activeModeBadge').className = 'w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 ' + mode.badgeBg;
+      // Update Desktop Header Text & Icons
+      const activeTitle = document.getElementById('activeModeTitle');
+      const activeDesc = document.getElementById('activeModeDesc');
+      const activeIcon = document.getElementById('activeModeIcon');
+      const activeBadge = document.getElementById('activeModeBadge');
+      if (activeTitle) activeTitle.textContent = mode.title;
+      if (activeDesc) activeDesc.textContent = mode.desc;
+      if (activeIcon) activeIcon.className = 'fa-solid ' + mode.icon;
+      if (activeBadge) activeBadge.className = 'w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 ' + mode.badgeBg;
+
+      // Update Mobile Header Mode Bar
+      const mobileBadge = document.getElementById('mobileActiveModeBadge');
+      const mobileIcon = document.getElementById('mobileActiveModeIcon');
+      const mobileTitle = document.getElementById('mobileActiveModeTitle');
+      if (mobileBadge && mobileIcon && mobileTitle) {
+        mobileBadge.className = `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border shadow-xs transition-all cursor-pointer truncate ${mode.pillClass}`;
+        mobileIcon.className = `fa-solid ${mode.icon} text-[10px]`;
+        mobileTitle.textContent = mode.title;
+      }
 
       // Update Input Placeholder & Tip
       promptInput.placeholder = mode.placeholder;
@@ -1740,8 +1814,8 @@
 
     function switchModeAndCloseWelcome(mode) {
       closeWelcomeModal();
-      if (mode && typeof setServiceMode === 'function') {
-        setServiceMode(mode);
+      if (mode && typeof switchServiceMode === 'function') {
+        switchServiceMode(mode);
       }
     }
 
@@ -1981,6 +2055,13 @@
     let recordTimerInterval = null;
     let recordSeconds = 0;
     let isProcessing = false;
+
+    // Multi-turn Chat Conversation Memory per Service Mode
+    const chatHistories = {
+      consultation: [],
+      diagnosis: [],
+      market: []
+    };
 
     // DOM Elements
     const chatContainer = document.getElementById('chatContainer');
@@ -2223,6 +2304,9 @@
     }
 
     function resetChat() {
+      if (chatHistories[currentServiceMode]) {
+        chatHistories[currentServiceMode] = [];
+      }
       const activeList = document.getElementById(`messagesList-${currentServiceMode}`);
       if (activeList) activeList.innerHTML = '';
 
@@ -2327,7 +2411,7 @@
           <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white font-display">FarmIQ Specialist</span>
-              <span class="text-[10px] ${mode.badgeBg} px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-800 font-medium">${mode.title.split(' ')[0]}</span>
+              <span class="text-[10px] ${mode.pillClass} px-2 py-0.5 rounded-full border font-medium flex items-center gap-1"><i class="fa-solid ${mode.icon} text-[9px]"></i>${mode.shortTitle}</span>
               ${hasImage ? '<span class="text-[10px] bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 px-2 py-0.5 rounded-full border border-rose-200 dark:border-rose-700/50"><i class="fa-solid fa-image text-[9px] mr-1"></i>Analisis Citra</span>' : ''}
               ${hasAudio ? '<span class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700/50"><i class="fa-solid fa-microphone text-[9px] mr-1"></i>Analisis Suara</span>' : ''}
             </div>
@@ -2367,9 +2451,106 @@
       return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
+    // ==========================================
+    // Daily Free Quota Controller (15 chat/hari)
+    // ==========================================
+    const DAILY_FREE_QUOTA = 15;
+
+    function getTodayString() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function getDailyUsage() {
+      try {
+        const stored = localStorage.getItem('farmiq_daily_quota');
+        const today = getTodayString();
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.date === today && typeof parsed.used === 'number') {
+            return parsed;
+          }
+        }
+        const initial = { date: today, used: 0 };
+        localStorage.setItem('farmiq_daily_quota', JSON.stringify(initial));
+        return initial;
+      } catch {
+        return { date: getTodayString(), used: 0 };
+      }
+    }
+
+    function incrementDailyUsage() {
+      try {
+        const usage = getDailyUsage();
+        usage.used += 1;
+        localStorage.setItem('farmiq_daily_quota', JSON.stringify(usage));
+        updateQuotaUI();
+      } catch (err) {
+        console.warn('Failed to update quota usage:', err);
+      }
+    }
+
+    function updateQuotaUI() {
+      const usage = getDailyUsage();
+      const remaining = Math.max(0, DAILY_FREE_QUOTA - usage.used);
+      const quotaText = document.getElementById('quotaRemainingText');
+      const quotaBadge = document.getElementById('quotaBadgeContainer');
+
+      if (quotaText) {
+        quotaText.textContent = `${remaining}/${DAILY_FREE_QUOTA}`;
+      }
+
+      if (quotaBadge) {
+        if (remaining <= 3 && remaining > 0) {
+          quotaBadge.className = 'shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 shadow-xs cursor-pointer';
+        } else if (remaining === 0) {
+          quotaBadge.className = 'shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-700 shadow-xs cursor-pointer';
+        } else {
+          quotaBadge.className = 'shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-xs hover:border-emerald-400 transition cursor-pointer';
+        }
+      }
+    }
+
+    function openQuotaInfoModal() {
+      const usage = getDailyUsage();
+      const remaining = Math.max(0, DAILY_FREE_QUOTA - usage.used);
+      if (remaining === 0) {
+        openQuotaExceededModal();
+      } else {
+        alert(`Sisa kuota chat gratis Anda hari ini: ${remaining} dari total ${DAILY_FREE_QUOTA} pertanyaan.\n\nKuota harian akan otomatis di-reset kembali ke ${DAILY_FREE_QUOTA} setiap pukul 00:00 WIB.`);
+      }
+    }
+
+    function openQuotaExceededModal() {
+      const modal = document.getElementById('quotaExceededModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeQuotaModal() {
+      const modal = document.getElementById('quotaExceededModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function closeQuotaModalAndOpenFeedback() {
+      closeQuotaModal();
+      openFeedbackModal();
+      const catSelect = document.getElementById('feedbackCategory');
+      const msgInput = document.getElementById('feedbackMessage');
+      if (catSelect) catSelect.value = 'Saran Fitur';
+      if (msgInput && !msgInput.value) {
+        msgInput.value = 'Halo tim FarmIQ, saya sangat terbantu dengan aplikasi ini dan ingin mengajukan permohonan kuota chat tambahan atau paket khusus.';
+      }
+    }
+
     chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (isProcessing) return;
+
+      const usage = getDailyUsage();
+      if (usage.used >= DAILY_FREE_QUOTA) {
+        openQuotaExceededModal();
+        return;
+      }
 
       const promptText = promptInput.value.trim();
       const imageFile = (currentServiceMode === 'diagnosis') ? selectedImageFile : null;
@@ -2408,6 +2589,7 @@
 
       try {
         const formData = new FormData();
+        formData.append('mode', activeMode);
         
         let enrichedPrompt = promptText;
         if (activeMode === 'market' && promptText && !promptText.toLowerCase().includes('harga') && !promptText.toLowerCase().includes('pasar')) {
@@ -2426,6 +2608,12 @@
           formData.append('audio', audioFile);
         }
 
+        // Send multi-turn history for this mode (up to 10 latest exchanges)
+        const pastHistory = chatHistories[activeMode] || [];
+        if (pastHistory.length > 0) {
+          formData.append('history', JSON.stringify(pastHistory.slice(-10)));
+        }
+
         const res = await fetch('/api/chat', {
           method: 'POST',
           body: formData
@@ -2436,6 +2624,20 @@
         if (!res.ok || !data.success) {
           throw new Error(data.error || `Server Error (${res.status})`);
         }
+
+        // Increment daily quota on success
+        incrementDailyUsage();
+
+        // Record successful turn in active mode memory
+        if (!chatHistories[activeMode]) chatHistories[activeMode] = [];
+        chatHistories[activeMode].push({
+          role: 'user',
+          text: promptText || (audioFile ? '[Mengirim Voice Note / Rekaman Suara]' : '[Mengunggah Foto]')
+        });
+        chatHistories[activeMode].push({
+          role: 'model',
+          text: data.reply
+        });
 
         appendAiMessage(data.reply, data.hasImage, data.hasAudio, data.model, activeMode);
 
@@ -2451,6 +2653,7 @@
     });
 
     switchServiceMode(currentServiceMode);
+    updateQuotaUI();
   </script>
 </body>
 </html>

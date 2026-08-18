@@ -196,5 +196,205 @@ export const dbService = {
       byCategory,
       byRating
     };
+  },
+
+  // Export feedbacks in JSON or CSV format
+  exportFeedbacks(format: 'json' | 'csv' = 'json'): { mimeType: string; filename: string; content: string } {
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[-:T]/g, '').substring(0, 14);
+
+    if (format === 'csv') {
+      const headers = ['id', 'name', 'contact', 'category', 'rating', 'message', 'status', 'ip_address', 'user_agent', 'created_at'];
+      const escapeCSV = (val: unknown): string => {
+        if (val === null || val === undefined) return '';
+        const str = String(val);
+        if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      const rows = feedbacksCache.map(r => [
+        r.id,
+        escapeCSV(r.name),
+        escapeCSV(r.contact),
+        escapeCSV(r.category),
+        r.rating,
+        escapeCSV(r.message),
+        escapeCSV(r.status),
+        escapeCSV(r.ip_address),
+        escapeCSV(r.user_agent),
+        escapeCSV(r.created_at)
+      ].join(','));
+
+      const csvContent = [headers.join(','), ...rows].join('\r\n');
+
+      return {
+        mimeType: 'text/csv; charset=utf-8',
+        filename: `farmiq-feedbacks-${timestamp}.csv`,
+        content: csvContent
+      };
+    }
+
+    return {
+      mimeType: 'application/json; charset=utf-8',
+      filename: `farmiq-feedbacks-${timestamp}.json`,
+      content: JSON.stringify(feedbacksCache, null, 2)
+    };
+  },
+
+  // Parse CSV string into array of records
+  parseCSV(csvText: string): Array<Record<string, string>> {
+    const lines: string[][] = [];
+    let currentRow: string[] = [];
+    let currentField = '';
+    let insideQuotes = false;
+
+    for (let i = 0; i < csvText.length; i++) {
+      const char = csvText[i];
+      const nextChar = csvText[i + 1];
+
+      if (char === '"') {
+        if (insideQuotes && nextChar === '"') {
+          currentField += '"';
+          i++; // skip escaped quote
+        } else {
+          insideQuotes = !insideQuotes;
+        }
+      } else if (char === ',' && !insideQuotes) {
+        currentRow.push(currentField.trim());
+        currentField = '';
+      } else if ((char === '\r' || char === '\n') && !insideQuotes) {
+        if (char === '\r' && nextChar === '\n') {
+          i++;
+        }
+        currentRow.push(currentField.trim());
+        currentField = '';
+        if (currentRow.some(field => field.length > 0)) {
+          lines.push(currentRow);
+        }
+        currentRow = [];
+      } else {
+        currentField += char;
+      }
+    }
+
+    if (currentField.length > 0 || currentRow.length > 0) {
+      currentRow.push(currentField.trim());
+      if (currentRow.some(field => field.length > 0)) {
+        lines.push(currentRow);
+      }
+    }
+
+    if (lines.length === 0) return [];
+
+    const headers = lines[0].map(h => h.toLowerCase().replace(/^["']|["']$/g, '').trim());
+    const records: Array<Record<string, string>> = [];
+
+    for (let r = 1; r < lines.length; r++) {
+      const row = lines[r];
+      const obj: Record<string, string> = {};
+      headers.forEach((header, idx) => {
+        obj[header] = row[idx] !== undefined ? row[idx] : '';
+      });
+      records.push(obj);
+    }
+
+    return records;
+  },
+
+  // Import feedbacks from array of raw objects (supports merge or replace)
+  importFeedbacks(
+    rawRecords: Array<Record<string, unknown>>,
+    mode: 'merge' | 'replace' = 'merge'
+  ): { importedCount: number; totalCount: number; mode: string } {
+    if (!Array.isArray(rawRecords)) {
+      throw new Error('Data impor harus berupa daftar array masukan.');
+    }
+
+    const validRecords: FeedbackRecord[] = [];
+    const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+    for (const raw of rawRecords) {
+      const message = String(raw.message || raw.pesan || raw.Message || raw.Pesan || '').trim();
+      if (!message) continue; // skip invalid empty message
+
+      const name = raw.name || raw.nama || raw.Name || raw.Nama ? String(raw.name || raw.nama || raw.Name || raw.Nama).trim() : null;
+      const contact = raw.contact || raw.kontak || raw.telepon || raw.whatsapp || raw.Contact || raw.Kontak
+        ? String(raw.contact || raw.kontak || raw.telepon || raw.whatsapp || raw.Contact || raw.Kontak).trim()
+        : null;
+      const category = raw.category || raw.kategori || raw.Category || raw.Kategori
+        ? String(raw.category || raw.kategori || raw.Category || raw.Kategori).trim()
+        : 'Saran Fitur';
+      const rawRating = Number(raw.rating || raw.nilai || raw.Rating || raw.Nilai) || 5;
+      const rating = Math.max(1, Math.min(5, rawRating));
+
+      let status: 'unread' | 'reviewed' | 'resolved' = 'unread';
+      const rawStatus = String(raw.status || raw.Status || '').toLowerCase().trim();
+      if (rawStatus === 'reviewed' || rawStatus === 'ditelaah') status = 'reviewed';
+      else if (rawStatus === 'resolved' || rawStatus === 'selesai') status = 'resolved';
+
+      const createdAt = raw.created_at || raw.createdAt || raw.tanggal || raw.Created_at
+        ? String(raw.created_at || raw.createdAt || raw.tanggal || raw.Created_at).trim()
+        : now;
+      const ipAddress = raw.ip_address || raw.ipAddress ? String(raw.ip_address || raw.ipAddress).trim() : null;
+      const userAgent = raw.user_agent || raw.userAgent ? String(raw.user_agent || raw.userAgent).trim() : null;
+
+      const recordId = Number(raw.id || raw.ID || raw.Id) || 0;
+
+      validRecords.push({
+        id: recordId,
+        name: name || null,
+        contact: contact || null,
+        category,
+        rating,
+        message,
+        status,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        created_at: createdAt
+      });
+    }
+
+    if (validRecords.length === 0) {
+      throw new Error('Tidak ada baris data masukan yang valid untuk diimpor. Pastikan kolom "message" atau "pesan" terisi.');
+    }
+
+    if (mode === 'replace') {
+      let currentNextId = 1;
+      feedbacksCache = validRecords.map(r => {
+        const assignedId = r.id > 0 ? r.id : currentNextId++;
+        currentNextId = Math.max(currentNextId, assignedId + 1);
+        return { ...r, id: assignedId };
+      });
+      nextId = currentNextId;
+    } else {
+      // Merge mode
+      let currentNextId = feedbacksCache.reduce((max, f) => Math.max(max, f.id), 0) + 1;
+      const existingIds = new Set(feedbacksCache.map(f => f.id));
+
+      for (const rec of validRecords) {
+        let finalId = rec.id;
+        if (finalId <= 0 || existingIds.has(finalId)) {
+          finalId = currentNextId++;
+        } else {
+          currentNextId = Math.max(currentNextId, finalId + 1);
+        }
+        existingIds.add(finalId);
+        feedbacksCache.push({ ...rec, id: finalId });
+      }
+      nextId = currentNextId;
+    }
+
+    // Sort descending by id
+    feedbacksCache.sort((a, b) => b.id - a.id);
+
+    saveToDisk();
+
+    return {
+      importedCount: validRecords.length,
+      totalCount: feedbacksCache.length,
+      mode
+    };
   }
 };

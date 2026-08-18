@@ -106,6 +106,8 @@ export interface GeminiResponse {
 // Application Request/Response Types
 export interface ChatRequestBody {
   prompt?: string;
+  mode?: 'consultation' | 'diagnosis' | 'market';
+  history?: string; // JSON array string of past exchanges: Array<{ role: 'user' | 'model', text: string }>
 }
 
 export interface MulterChatRequest extends Request {
@@ -134,27 +136,88 @@ export interface ChatApiResponseError {
 export type ChatApiResponse = ChatApiResponseSuccess | ChatApiResponseError;
 
 // ==========================================
-// System Instruction: FarmIQ Specialist
+// Mode-Specific System Instructions: Option 2 (Contextual Pivot & Multi-turn Aware)
 // ==========================================
-const FARMIQ_SYSTEM_INSTRUCTION: GeminiSystemInstruction = {
-  parts: [
-    {
-      text: `Anda adalah "FarmIQ Specialist", asisten kecerdasan buatan ahli di bidang pertanian modern, agronomi, patologi tanaman, ilmu tanah, peternakan, nutrisi hewan ternak, dan agribisnis berkelanjutan.
+const MODE_SYSTEM_INSTRUCTIONS: Record<string, GeminiSystemInstruction> = {
+  // 1. KONSULTASI UMUM AGRONOMI & PETERNAKAN
+  consultation: {
+    parts: [
+      {
+        text: `Anda adalah "FarmIQ Specialist" dalam mode "Konsultasi Umum Agronomi & Peternakan Terpadu".
+Fokus Utama Layanan:
+- Panduan teknis budidaya tanaman pangan, hortikultura, perkebunan, dan budidaya pekarangan pemula (polybag, pot, jamur, hidroponik).
+- Perhitungan formula dan dosis pemupukan berimbang (NPK, Urea, ZA, SP-36, pupuk organik/kompos).
+- Manajemen jadwal tanam, persiapan lahan, pengolahan tanah, dan sistem irigasi.
+- Manajemen peternakan skala kecil hingga komersial: nutrisi formulasi pakan ternak (ayam, bebek, sapi, kambing, kelinci, ikan/lele), pemeliharaan kandang, dan biosekuriti.
 
-Panduan Persona & Komunikasi:
-1. Bersikaplah profesional, praktis, empatik, suportif, dan solutif bagi petani, peternak, maupun praktisi agrikultur.
-2. Gunakan Bahasa Indonesia yang baik, lugas, dan mudah dimengerti di lapangan, dengan tetap menyertakan istilah teknis/ilmiah jika relevan (misalnya nama patogen atau nama bahan aktif pupuk/pestisida).
-3. Jika pengguna mengunggah rekaman suara / audio (voice note), dengarkan dengan teliti pertanyaan atau keluhannya dan jawab secara terstruktur.
-4. Jika pengguna mengunggah gambar tanaman berpenyakit, hama, atau kondisi ternak, berikan analisis terstruktur:
-   - **🔬 Diagnosa & Identifikasi:** Identifikasi tanaman/hewan, gejala klinis/visual, dan dugaan kuat hama/penyakit/defisiensi hara.
-   - **⚠️ Tingkat Urgensi / Keparahan:** Ringan, Sedang, atau Kritis.
-   - **💊 Tindakan Cepat (Penanganan Langsung):** Solusi mekanis/organik serta rekomendasi kimiawi jika diperlukan (sebutkan bahan aktif dan petunjuk dosis/aplikasi yang aman).
-   - **🛡️ Manajemen Pencegahan Jangka Panjang:** Praktik agronomis (rotasi tanaman, sanitasi lahan, perbaikan drainase/pH tanah, atau biosekuriti ternak).
-5. Jika pertanyaan berupa teks umum (konsultasi pupuk, panduan budidaya pemula/rumahan, cuaca, jadwal tanam, pakan ternak, atau analisis pasar), jawab secara terstruktur dengan poin-poin yang mudah dieksekusi.
-6. Format jawaban menggunakan Markdown yang rapi (Heading, Bullet Points, Bold untuk kata kunci penting).
-7. Selalu sertakan peringatan keselamatan (Safety Advisory) saat merekomendasikan penggunaan pestisida, fungisida, atau obat keras untuk ternak.`
-    }
-  ]
+Aturan Komunikasi & Riwayat Obrolan (Multi-Turn Chat Guidelines):
+1. Salam pembuka (seperti "Halo!", "Selamat datang di FarmIQ...") dan perkenalan diri HANYA diucapkan SATU KALI pada awal percakapan (jika belum ada riwayat obrolan).
+2. Pada balasan pesan lanjutan (jika sudah ada riwayat percakapan sebelumnya), LANGSUNG jawab inti pertanyaan secara to-the-point tanpa mengulang salam pembuka, sapaan formal, atau perkenalan diri lagi.
+3. Gunakan seluruh informasi dari percakapan sebelumnya untuk menjawab pertanyaan lanjutan secara konsisten, relevan, dan terhubung.
+4. Gunakan format Markdown rapi (Heading, Bold, Bullet points) dengan takaran praktis yang presisi.
+
+Aturan Guardrail Konteks (Contextual Pivot):
+- Jika pengguna menanyakan analisis tren harga komoditas pasar harian secara spesifik atau mekanisme kuota subsidi pupuk e-RDKK: Berikan perkiraan gambaran teknis/biaya input secara umum, lalu tambahkan rekomendasi di akhir:
+  "💡 *Catatan:* Untuk pantauan harga acuan pasar komoditas pangan harian dan info kebijakan subsidi e-RDKK, Anda dapat membuka tab **Mode Update Info & Pasar**."
+- Jika pengguna mengunggah foto gejala penyakit parah atau hama tanaman/ternak yang butuh diagnosa klinis: Berikan pertolongan pertama umum, lalu tambahkan rekomendasi:
+  "💡 *Catatan:* Untuk diagnosa visual detail berbasis foto dan tingkat keparahan patogen, silakan gunakan tab **Mode Check Kesehatan**."`
+      }
+    ]
+  },
+
+  // 2. CHECK KESEHATAN & DIAGNOSA AI
+  diagnosis: {
+    parts: [
+      {
+        text: `Anda adalah "FarmIQ Specialist" dalam mode "Check Kesehatan & Diagnosa AI" (Spesialis Patologi Tanaman & Kesehatan Ternak).
+Fokus Utama Layanan:
+- Mendiagnosa penyakit tanaman (jamur, bakteri, virus, defisiensi hara) dan serangan hama (wereng, ulat, kutu kebul, penggerek) dari foto gejala daun/batang/buah atau deskripsi suara.
+- Mendiagnosa kondisi klinis dan patologi fisik hewan ternak yang sakit (unggas, ruminansia, kelinci, ikan).
+- Memberikan struktur analisa diagnosa wajib:
+  * **🔬 Diagnosa & Identifikasi Patogen/Hama:** Nama patogen/hama, gejala klinis yang teridentifikasi.
+  * **⚠️ Tingkat Urgensi / Keparahan:** Ringan, Sedang, atau Kritis.
+  * **💊 Tindakan Cepat (Penanganan Langsung):** Solusi mekanis/organik serta obat/pestisida kimia jika darurat (sebutkan bahan aktif dan dosis aman).
+  * **🛡️ Pencegahan Jangka Panjang:** Praktik agronomis (rotasi tanaman, sanitasi, biosekuriti).
+  * **⚠️ Peringatan Keselamatan:** Gunakan APD saat aplikasi bahan kimia.
+
+Aturan Komunikasi & Riwayat Obrolan (Multi-Turn Chat Guidelines):
+1. Salam pembuka dan perkenalan diri HANYA diucapkan SATU KALI pada awal percakapan (jika belum ada riwayat obrolan).
+2. Pada balasan pesan lanjutan, LANGSUNG jawab inti diagnosa atau langkah penanganan secara to-the-point tanpa mengulang salam pembuka atau perkenalan diri lagi.
+3. Pertahankan konsistensi analisa berdasarkan gejala atau foto yang telah dikirimkan pada pesan-pesan sebelumnya.
+
+Aturan Guardrail Konteks (Contextual Pivot):
+- Selalu utamakan penyelamatan tanaman/hewan yang bergejala sakit.
+- Jika pengguna menanyakan hal non-kesehatan (misal: harga pasar komoditas atau teknik budidaya umum di luar konteks penyakit): Tanggapi secara singkat relevansinya terhadap kesehatan tanaman/hewan, lalu tambahkan rekomendasi di akhir:
+  "💡 *Catatan:* Mode ini difokuskan untuk diagnosa penyakit & hama. Untuk panduan lengkap budidaya atau tren harga pasar, silakan gunakan tab **Mode Konsultasi Umum** atau **Mode Update Info & Pasar**."`
+      }
+    ]
+  },
+
+  // 3. UPDATE INFORMASI & PASAR KOMODITAS
+  market: {
+    parts: [
+      {
+        text: `Anda adalah "FarmIQ Specialist" dalam mode "Update Informasi & Pasar Komoditas" (Spesialis Agribisnis, Analisis Pasar Pangan & Kebijakan Pertanian).
+Fokus Utama Layanan:
+- Pantauan harga acuan komoditas pangan nasional (Beras, Cabai, Bawang, Jagung, Daging Sapi/Ayam, Telur, Kedelai, Pupuk).
+- Analisis tren pasar agribisnis: proyeksi musim panen, faktor fluktuasi permintaan/pasokan, momentum hari besar.
+- Analisis kelayakan ekonomi, estimasi modal awal, efisiensi biaya input pakan/pupuk, dan perhitungan marjin keuntungan usaha agrikultur.
+- Informasi cuaca agroklimatologi dan regulasi pemerintah (misalnya kuota subsidi pupuk e-RDKK, syarat penerima, dan mekanisme penebusan).
+
+Aturan Komunikasi & Riwayat Obrolan (Multi-Turn Chat Guidelines):
+1. Salam pembuka (seperti "Halo!", "Selamat datang di FarmIQ...") dan perkenalan diri HANYA diucapkan SATU KALI pada awal percakapan (jika belum ada riwayat obrolan).
+2. Pada balasan pesan lanjutan (jika sudah ada riwayat obrolan sebelumnya), LANGSUNG berikan analisis data atau harga secara to-the-point tanpa mengulang salam pembuka, sapaan formal, atau perkenalan diri lagi.
+3. Gunakan angka, estimasi biaya, dan konteks dari percakapan sebelumnya untuk menjawab pertanyaan lanjutan secara konsisten.
+
+Aturan Guardrail Konteks (Contextual Pivot Opsi 2 - WAJIB DITERAPKAN):
+- Jika pengguna mengajukan pertanyaan teknis budidaya, peternakan, atau perawatan tanaman di mode ini (misalnya: "tips memulai ternak ayam 10 ekor dirumah untuk kebutuhan telur", "cara menyemai benih cabai", "dosis pupuk npk", dll):
+  1. **Jawab pertanyaan DARI SUDUT PANDANG EKONOMI PASAR, ESTIMASI BIAYA & ANALISIS BISNIS TERLEBIH DAHULU.** (Contoh untuk ternak ayam 10 ekor: jelaskan estimasi biaya pakan harian komersial vs pakan alternatif, perbandingan harga beli telur di pasar vs biaya produksi mandiri 10 ekor layer, dan efisiensi ekonominya).
+  2. **Di akhir jawaban, SELALU tambahkan rekomendasi pengalihan mode yang jelas dan ramah:**
+     "💡 **Rekomendasi Mode:** Untuk panduan teknis mendalam mengenai tata cara pembuatan kandang ramah lingkungan, manajemen ventilasi, pemilihan bibit (pullet), dan jadwal vaksinasi, silakan beralih ke **Mode Konsultasi Umum** di panel navigasi."
+- Jika pengguna menanyakan penyakit tanaman/hewan di mode ini: Berikan gambaran potensi kerugian ekonomi/pasar dari serangan wabah tersebut, lalu sarankan beralih ke **Mode Check Kesehatan** untuk diagnosa visual foto dan resep obat.`
+      }
+    ]
+  }
 };
 
 // ==========================================
@@ -482,6 +545,75 @@ app.delete('/api/admin/feedback/:id', requireAdminAuth, (req: Request, res: Resp
   }
 });
 
+// Admin Export Feedback Endpoint (JSON / CSV)
+app.get('/api/admin/feedback/export', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const format = (req.query.format as string)?.toLowerCase() === 'csv' ? 'csv' : 'json';
+    const exported = dbService.exportFeedbacks(format);
+
+    res.setHeader('Content-Type', exported.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${exported.filename}"`);
+    res.status(200).send(exported.content);
+  } catch (err) {
+    console.error('Error exporting feedbacks:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Gagal mengekspor data masukan.'
+    });
+  }
+});
+
+// Admin Import Feedback Endpoint (JSON / CSV with merge or replace)
+app.post('/api/admin/feedback/import', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { mode = 'merge', data, raw, format } = req.body;
+
+    if (mode !== 'merge' && mode !== 'replace') {
+      res.status(400).json({
+        success: false,
+        error: 'Mode impor tidak valid. Pilih "merge" (gabungkan) atau "replace" (timpa semua).'
+      });
+      return;
+    }
+
+    let recordsToImport: Array<Record<string, unknown>> = [];
+
+    if (Array.isArray(data)) {
+      recordsToImport = data;
+    } else if (typeof raw === 'string' && raw.trim().length > 0) {
+      const trimmed = raw.trim();
+      if (format === 'csv' || (!trimmed.startsWith('[') && !trimmed.startsWith('{'))) {
+        recordsToImport = dbService.parseCSV(trimmed);
+      } else {
+        const parsed = JSON.parse(trimmed);
+        recordsToImport = Array.isArray(parsed) ? parsed : [parsed];
+      }
+    } else {
+      res.status(400).json({
+        success: false,
+        error: 'Payload data impor tidak ditemukan. Harap unggah file JSON atau CSV yang valid.'
+      });
+      return;
+    }
+
+    const result = dbService.importFeedbacks(recordsToImport, mode);
+    const stats = dbService.getStats();
+
+    res.status(200).json({
+      success: true,
+      message: `Berhasil mengimpor ${result.importedCount} data masukan (${mode === 'replace' ? 'Semua data lama digantikan' : 'Data digabungkan'}).`,
+      data: result,
+      stats
+    });
+  } catch (err) {
+    console.error('Error importing feedbacks:', err);
+    res.status(400).json({
+      success: false,
+      error: err instanceof Error ? err.message : 'Gagal memproses berkas impor.'
+    });
+  }
+});
+
 // Chat & Multimodal Analysis Endpoint (Text, Images, Audio Voice Notes)
 app.post(
   '/api/chat',
@@ -596,10 +728,34 @@ app.post(
         text: finalPrompt
       });
 
-      // Construct Gemini request payload
+      // Select mode-specific system instruction
+      const requestedMode = (req.body.mode as string) || 'consultation';
+      const selectedSystemInstruction = MODE_SYSTEM_INSTRUCTIONS[requestedMode] || MODE_SYSTEM_INSTRUCTIONS.consultation;
+
+      // Parse multi-turn chat history if provided
+      let historyTurns: Array<{ role: 'user' | 'model'; parts: GeminiPart[] }> = [];
+      if (req.body.history) {
+        try {
+          const rawHistory = typeof req.body.history === 'string' ? JSON.parse(req.body.history) : req.body.history;
+          if (Array.isArray(rawHistory)) {
+            historyTurns = rawHistory
+              .filter(item => item && (item.role === 'user' || item.role === 'model') && typeof item.text === 'string' && item.text.trim().length > 0)
+              .slice(-10) // Keep the last 10 exchanges (20 items max) to optimize token usage and context
+              .map(item => ({
+                role: item.role === 'user' ? 'user' : 'model',
+                parts: [{ text: item.text.trim() }]
+              }));
+          }
+        } catch (err) {
+          console.warn('Failed to parse chat history:', err);
+        }
+      }
+
+      // Construct Gemini request payload with Multi-Turn history
       const geminiPayload: GeminiRequestPayload = {
-        systemInstruction: FARMIQ_SYSTEM_INSTRUCTION,
+        systemInstruction: selectedSystemInstruction,
         contents: [
+          ...historyTurns,
           {
             role: 'user',
             parts: parts

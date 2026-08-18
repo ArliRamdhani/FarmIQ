@@ -1,5 +1,11 @@
 # FarmIQ 🌾
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-farmiq--2he9.onrender.com-emerald?style=for-the-badge&logo=render)](https://farmiq-2he9.onrender.com/)
+[![Admin Portal](https://img.shields.io/badge/Admin%20Portal-%2Fadmin-blue?style=for-the-badge&logo=shield)](https://farmiq-2he9.onrender.com/admin)
+
+🌐 **URL Aplikasi (Live Production):** [https://farmiq-2he9.onrender.com/](https://farmiq-2he9.onrender.com/)  
+💼 **Portal Admin:** [https://farmiq-2he9.onrender.com/admin](https://farmiq-2he9.onrender.com/admin)
+
 **FarmIQ** adalah platform asisten kecerdasan buatan terpadu (*AI-Powered Agriculture & Livestock Specialist*) yang dirancang khusus untuk mendampingi petani, peternak, penyuluh pertanian, dan praktisi agribisnis di Indonesia dalam mengambil keputusan budidaya yang presisi, efisien, dan ramah lingkungan.
 
 Didukung oleh **Google Gemini REST API**, FarmIQ mampu memproses teks pertanyaan, rekaman suara langsung (*live voice notes* via mikrofon), serta unggahan foto tanaman/hewan untuk memberikan solusi dan diagnosa real-time di lapangan.
@@ -15,7 +21,7 @@ Didukung oleh **Google Gemini REST API**, FarmIQ mampu memproses teks pertanyaan
 * **🎙️ Rekaman Suara Langsung / Voice Note:** Fitur rekam mikrofon langsung di semua mode layanan (*tanpa repot upload file audio*), dilengkapi penghitung durasi dan pemutar audio pratinjau.
 * **🗂️ Ruang Obrolan Terpisah (*Multi-Tab Chat Sessions*):** Setiap mode layanan (*Konsultasi*, *Check Kesehatan*, dan *Update Pasar*) memiliki ruang dan riwayat percakapan independen.
 * **💬 Formulir Masukan Pengguna (User Feedback):** Fitur interaktif bagi pengguna untuk memberikan rating (1–5 bintang), kritik, dan saran pengembangan aplikasi yang disimpan aman pada penyimpanan lokal (`data/feedbacks.json`).
-* **🔒 Portal Admin Khusus Pengelola (`/admin`):** Dashboard manajemen umpan balik bagi developer/owner yang dilindungi otentikasi token bertanda tangan **HMAC SHA-256**, dilengkapi statistik real-time, filter status, pencarian, tautan cepat WhatsApp, dan ekspor CSV.
+* **🔒 Portal Admin Khusus Pengelola (`/admin`):** Dashboard manajemen umpan balik bagi developer/owner yang dilindungi otentikasi token bertanda tangan **HMAC SHA-256**, dilengkapi statistik real-time, filter status, pencarian, tautan cepat WhatsApp, **Ekspor & Impor Data (JSON & CSV)** dengan opsi *Merge* atau *Replace* untuk menjaga kelangsungan data saat proses *deploy*.
 * **🌓 Mode Tampilan Gelap & Terang:** Antarmuka modern yang nyaman digunakan baik di bawah terik matahari maupun malam hari.
 
 ---
@@ -263,6 +269,37 @@ npm run dev
 * **Path:** `/api/admin/feedback/:id`
 * **Headers:** `Authorization: Bearer <token>`
 
+### 8. Ekspor Data Feedback (JSON & CSV)
+* **Method:** `GET`
+* **Path:** `/api/admin/feedback/export?format=json` (atau `?format=csv`)
+* **Headers:** `Authorization: Bearer <token>`
+* **Response:** Mengunduh file backup `farmiq-feedbacks-YYYYMMDD-HHmmss.json` atau `.csv`.
+
+### 9. Impor Data Feedback (JSON & CSV)
+* **Method:** `POST`
+* **Path:** `/api/admin/feedback/import`
+* **Headers:** `Authorization: Bearer <token>`, `Content-Type: application/json`
+* **Request Body:**
+  ```json
+  {
+    "mode": "merge",
+    "format": "json",
+    "raw": "[{\"name\":\"Petani\",\"message\":\"Saran fitur...\",\"rating\":5}]"
+  }
+  ```
+* **Response Sukses (`200 OK`):**
+  ```json
+  {
+    "success": true,
+    "message": "Berhasil mengimpor 1 data masukan (Data digabungkan).",
+    "data": {
+      "importedCount": 1,
+      "totalCount": 5,
+      "mode": "merge"
+    }
+  }
+  ```
+
 ---
 
 ## 🌐 Panduan Publikasi ke Server Gratis (*Free Hosting Deployment*)
@@ -303,7 +340,9 @@ Aplikasi FarmIQ dapat dipublikasikan ke internet secara gratis menggunakan layan
    *(Catatan: Anda tidak perlu mengatur versi Node khusus karena aplikasi kompatibel dengan semua versi Node.js LTS default seperti Node 18, 20, dan 22).*
 5. **Klik "Deploy Web Service":**
    - Tunggu proses build & deploy selesai (~2 menit).
-   - Render akan memberikan URL publik dengan HTTPS otomatis (misalnya: `https://farmiq.onrender.com`).
+   - Render menyediakan URL publik dengan HTTPS otomatis:
+     - 🌐 **Aplikasi Live:** [https://farmiq-2he9.onrender.com/](https://farmiq-2he9.onrender.com/)
+     - 💼 **Portal Admin:** [https://farmiq-2he9.onrender.com/admin](https://farmiq-2he9.onrender.com/admin)
 
 ---
 
@@ -313,12 +352,6 @@ Aplikasi FarmIQ dapat dipublikasikan ke internet secara gratis menggunakan layan
 2. Klik **New Project** > **Deploy from GitHub repo** > pilih repositori `farmiq`.
 3. Tambahkan Environment Variables di tab **Variables** (`GEMINI_API_KEY`, `GEMINI_MODEL`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`).
 4. Buka tab **Settings** > **Networking** > Klik **Generate Domain** untuk mendapatkan URL publik.
-
----
-
-### 💡 Tips & Catatan Produksi:
-* **Penyimpanan Data di Free Tier:** Data masukan pengguna tersimpan lokal di dalam container (`data/feedbacks.json`). Pada paket gratis Render/Railway, data masukan (*feedback*) dapat diunduh kapan saja dalam format spreadsheet melalui tombol **Ekspor CSV** di portal admin (`https://<domain-anda>/admin`).
-* **Ketersediaan Gemini API:** Dapatkan API Key gratis di [Google AI Studio](https://aistudio.google.com/).
 
 ---
 

@@ -250,8 +250,8 @@
             </button>
           </div>
 
-          <!-- Status & Export Actions -->
-          <div class="flex items-center gap-2">
+          <!-- Status, Export & Import Actions -->
+          <div class="flex flex-wrap items-center gap-2">
             <select id="statusFilterSelect" onchange="loadFeedbacks()" class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
               <option value="all">Status: Semua</option>
               <option value="unread">Status: Belum Dibaca</option>
@@ -259,11 +259,26 @@
               <option value="resolved">Status: Selesai</option>
             </select>
 
-            <button onclick="exportToCSV()" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm cursor-pointer" title="Download CSV">
-              <i class="fa-solid fa-file-csv text-sm text-emerald-600"></i>
-              <span>Export CSV</span>
+            <!-- Export Buttons Dropdown / Group -->
+            <div class="flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-0.5 shadow-sm">
+              <button onclick="exportFeedbacks('json')" class="px-2.5 sm:px-3 py-1.5 hover:bg-white dark:hover:bg-slate-700 hover:text-amber-600 dark:hover:text-amber-400 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer" title="Download Backup JSON">
+                <i class="fa-solid fa-file-code text-xs text-amber-500"></i>
+                <span>JSON</span>
+              </button>
+              <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-0.5"></div>
+              <button onclick="exportFeedbacks('csv')" class="px-2.5 sm:px-3 py-1.5 hover:bg-white dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer" title="Download Spreadsheet CSV">
+                <i class="fa-solid fa-file-csv text-xs text-emerald-600"></i>
+                <span>CSV</span>
+              </button>
+            </div>
+
+            <!-- Import Modal Trigger Button -->
+            <button onclick="openImportModal()" class="px-3.5 py-2 bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 transition cursor-pointer" title="Import Data dari JSON atau CSV">
+              <i class="fa-solid fa-file-import text-xs"></i>
+              <span>Import Data</span>
             </button>
 
+            <!-- Refresh Button -->
             <button onclick="loadFeedbacks()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs transition cursor-pointer" title="Segarkan Data">
               <i class="fa-solid fa-rotate-right"></i>
             </button>
@@ -295,6 +310,101 @@
 
     </main>
 
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. IMPORT DATA MODAL DIALOG               -->
+  <!-- ========================================== -->
+  <div id="importModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/70">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-file-import"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">Import Data Feedback</h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Pulihkan atau gabungkan data dari berkas JSON / CSV</p>
+          </div>
+        </div>
+        <button onclick="closeImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition cursor-pointer" aria-label="Tutup Dialog">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <form id="importForm" onsubmit="handleImportSubmit(event)" class="p-6 space-y-4 text-xs sm:text-sm">
+        
+        <!-- File Dropzone -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">Pilih Berkas Backup (.json atau .csv) <span class="text-rose-500">*</span></label>
+          <div id="dropzoneContainer" onclick="document.getElementById('importFileInput').click()" class="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-2xl p-5 text-center cursor-pointer bg-slate-50/60 dark:bg-slate-800/40 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition group">
+            <input type="file" id="importFileInput" accept=".json,.csv,text/csv,application/json" onchange="handleFileSelected(event)" class="hidden">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 flex items-center justify-center text-lg mx-auto mb-2 transition">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-700 dark:text-slate-200" id="dropzoneText">Klik untuk memilih berkas atau seret ke sini</p>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Format didukung: farmiq-feedbacks.json atau farmiq-feedbacks.csv</p>
+          </div>
+        </div>
+
+        <!-- File Preview Card (Hidden until selected) -->
+        <div id="filePreviewCard" class="hidden p-3 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <i id="filePreviewIcon" class="fa-solid fa-file-code text-lg text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+            <div class="min-w-0">
+              <p id="filePreviewName" class="font-bold text-slate-900 dark:text-slate-100 truncate">feedbacks.json</p>
+              <p id="filePreviewMeta" class="text-[10px] text-emerald-700 dark:text-emerald-400">12 KB • 15 baris data terdeteksi</p>
+            </div>
+          </div>
+          <button type="button" onclick="clearSelectedImportFile()" class="p-1 rounded-lg text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Hapus Berkas">
+            <i class="fa-solid fa-trash-can text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Import Mode Selection -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">Metode Impor Data</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 cursor-pointer hover:border-emerald-500 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/50 dark:has-[:checked]:bg-emerald-950/40 transition">
+              <input type="radio" name="importMode" value="merge" checked class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+              <div>
+                <span class="block font-bold text-xs text-slate-900 dark:text-white">🔄 Gabungkan (Merge)</span>
+                <span class="block text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Tambahkan data baru tanpa menghapus data yang sudah ada.</span>
+              </div>
+            </label>
+            <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 cursor-pointer hover:border-rose-500 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50/50 dark:has-[:checked]:bg-rose-950/40 transition">
+              <input type="radio" name="importMode" value="replace" class="mt-0.5 text-rose-600 focus:ring-rose-500">
+              <div>
+                <span class="block font-bold text-xs text-slate-900 dark:text-white">⚠️ Timpa Semua (Replace)</span>
+                <span class="block text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Ganti seluruh data saat ini dengan data dari berkas.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Alert Status Notification -->
+        <div id="importAlert" class="hidden p-3 rounded-xl text-xs flex items-center gap-2">
+          <i id="importAlertIcon" class="fa-solid fa-circle-info shrink-0 text-sm"></i>
+          <span id="importAlertMsg" class="flex-1"></span>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="closeImportModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+            Batal
+          </button>
+          <button type="submit" id="importSubmitBtn" class="px-5 py-2 bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm shadow-emerald-500/20 transition cursor-pointer">
+            <i class="fa-solid fa-file-import text-xs"></i>
+            <span>Proses Impor</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
   </div>
 
   <!-- JAVASCRIPT CONTROLLER FOR ADMIN PORTAL -->
@@ -592,32 +702,268 @@
       }
     }
 
-    function exportToCSV() {
-      if (!cachedFeedbacks || cachedFeedbacks.length === 0) {
-        alert('Tidak ada data feedback untuk di-export.');
+    // Export Feedbacks (JSON or CSV via Server or Direct Client Download)
+    async function exportFeedbacks(format = 'json') {
+      const token = getAdminToken();
+      try {
+        const res = await fetch(`/api/admin/feedback/export?format=${format}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+          throw new Error('Gagal mengunduh file ekspor dari server.');
+        }
+
+        const blob = await res.blob();
+        const disposition = res.headers.get('Content-Disposition') || '';
+        let filename = `farmiq-feedbacks-${new Date().toISOString().replace(/[-:T]/g, '').substring(0, 14)}.${format}`;
+        
+        const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+      } catch (err) {
+        console.error('Server export failed, attempting client fallback:', err);
+        // Client Fallback Export
+        if (!cachedFeedbacks || cachedFeedbacks.length === 0) {
+          alert('Tidak ada data feedback untuk di-export.');
+          return;
+        }
+
+        const timestamp = new Date().toISOString().replace(/[-:T]/g, '').substring(0, 14);
+        if (format === 'csv') {
+          const headers = ['id', 'name', 'contact', 'category', 'rating', 'message', 'status', 'created_at'];
+          const rows = cachedFeedbacks.map(f => [
+            f.id,
+            `"${(f.name || '').replace(/"/g, '""')}"`,
+            `"${(f.contact || '').replace(/"/g, '""')}"`,
+            `"${(f.category || '').replace(/"/g, '""')}"`,
+            f.rating,
+            `"${(f.message || '').replace(/"/g, '""')}"`,
+            f.status,
+            f.created_at
+          ]);
+          const csvStr = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+          downloadBlob(new Blob([csvStr], { type: 'text/csv;charset=utf-8;' }), `farmiq-feedbacks-${timestamp}.csv`);
+        } else {
+          const jsonStr = JSON.stringify(cachedFeedbacks, null, 2);
+          downloadBlob(new Blob([jsonStr], { type: 'application/json;charset=utf-8;' }), `farmiq-feedbacks-${timestamp}.json`);
+        }
+      }
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
+
+    // ==========================================
+    // Import Data Modal Controllers
+    // ==========================================
+    const importModal = document.getElementById('importModal');
+    const importFileInput = document.getElementById('importFileInput');
+    const filePreviewCard = document.getElementById('filePreviewCard');
+    const filePreviewName = document.getElementById('filePreviewName');
+    const filePreviewMeta = document.getElementById('filePreviewMeta');
+    const filePreviewIcon = document.getElementById('filePreviewIcon');
+    const dropzoneContainer = document.getElementById('dropzoneContainer');
+    const importAlert = document.getElementById('importAlert');
+    const importAlertMsg = document.getElementById('importAlertMsg');
+    const importAlertIcon = document.getElementById('importAlertIcon');
+    const importSubmitBtn = document.getElementById('importSubmitBtn');
+    let selectedImportFile = null;
+    let selectedFileContent = null;
+    let selectedFileFormat = null;
+
+    function openImportModal() {
+      if (importModal) {
+        importModal.classList.remove('hidden');
+        clearSelectedImportFile();
+        hideImportAlert();
+      }
+    }
+
+    function closeImportModal() {
+      if (importModal) {
+        importModal.classList.add('hidden');
+        clearSelectedImportFile();
+        hideImportAlert();
+      }
+    }
+
+    function showImportAlert(msg, isSuccess) {
+      if (!importAlert) return;
+      importAlert.className = isSuccess
+        ? 'p-3 rounded-xl text-xs flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60'
+        : 'p-3 rounded-xl text-xs flex items-center gap-2 bg-rose-50 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-700/60';
+      if (importAlertIcon) {
+        importAlertIcon.className = isSuccess ? 'fa-solid fa-circle-check text-emerald-600 dark:text-emerald-400 shrink-0' : 'fa-solid fa-circle-exclamation text-rose-600 dark:text-rose-400 shrink-0';
+      }
+      if (importAlertMsg) importAlertMsg.textContent = msg;
+      importAlert.classList.remove('hidden');
+    }
+
+    function hideImportAlert() {
+      if (importAlert) importAlert.classList.add('hidden');
+    }
+
+    function clearSelectedImportFile() {
+      selectedImportFile = null;
+      selectedFileContent = null;
+      selectedFileFormat = null;
+      if (importFileInput) importFileInput.value = '';
+      if (filePreviewCard) filePreviewCard.classList.add('hidden');
+      if (dropzoneContainer) dropzoneContainer.classList.remove('hidden');
+    }
+
+    function handleFileSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      processFile(file);
+    }
+
+    function processFile(file) {
+      const isJson = file.name.endsWith('.json') || file.type === 'application/json';
+      const isCsv = file.name.endsWith('.csv') || file.type === 'text/csv';
+
+      if (!isJson && !isCsv) {
+        showImportAlert('Format file tidak didukung. Harap pilih berkas .json atau .csv.', false);
         return;
       }
 
-      const headers = ['ID', 'Nama', 'Kategori', 'Rating', 'Kontak', 'Pesan', 'Status', 'Tanggal'];
-      const rows = cachedFeedbacks.map(f => [
-        f.id,
-        `"${(f.name || '').replace(/"/g, '""')}"`,
-        `"${f.category}"`,
-        f.rating,
-        `"${(f.contact || '').replace(/"/g, '""')}"`,
-        `"${f.message.replace(/"/g, '""')}"`,
-        f.status,
-        f.created_at
-      ]);
+      hideImportAlert();
+      selectedImportFile = file;
+      selectedFileFormat = isCsv ? 'csv' : 'json';
 
-      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement('a');
-      link.setAttribute('href', encodedUri);
-      link.setAttribute('download', `farmiq_feedback_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        selectedFileContent = e.target.result;
+        let lineEstimate = 'Format valid';
+        try {
+          if (isJson) {
+            const parsed = JSON.parse(selectedFileContent);
+            const count = Array.isArray(parsed) ? parsed.length : 1;
+            lineEstimate = `${count} data masukan terdeteksi`;
+          } else {
+            const lines = selectedFileContent.split('\n').filter(l => l.trim().length > 0);
+            const count = Math.max(0, lines.length - 1);
+            lineEstimate = `${count} baris CSV terdeteksi`;
+          }
+        } catch {
+          lineEstimate = 'Berkas teks terdeteksi';
+        }
+
+        const sizeKb = (file.size / 1024).toFixed(1);
+        filePreviewName.textContent = file.name;
+        filePreviewMeta.textContent = `${sizeKb} KB • ${lineEstimate}`;
+        filePreviewIcon.className = isJson ? 'fa-solid fa-file-code text-amber-500 text-lg' : 'fa-solid fa-file-csv text-emerald-500 text-lg';
+
+        dropzoneContainer.classList.add('hidden');
+        filePreviewCard.classList.remove('hidden');
+      };
+
+      reader.onerror = () => {
+        showImportAlert('Gagal membaca berkas yang dipilih.', false);
+      };
+
+      reader.readAsText(file);
+    }
+
+    // Drag & Drop Setup
+    if (dropzoneContainer) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzoneContainer.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzoneContainer.classList.add('border-emerald-500', 'bg-emerald-50/40');
+        });
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzoneContainer.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzoneContainer.classList.remove('border-emerald-500', 'bg-emerald-50/40');
+        });
+      });
+      dropzoneContainer.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const file = dt && dt.files && dt.files[0];
+        if (file) processFile(file);
+      });
+    }
+
+    async function handleImportSubmit(event) {
+      event.preventDefault();
+      if (!selectedFileContent) {
+        showImportAlert('Pilih berkas JSON atau CSV terlebih dahulu.', false);
+        return;
+      }
+
+      const modeInput = document.querySelector('input[name="importMode"]:checked');
+      const mode = modeInput ? modeInput.value : 'merge';
+
+      if (mode === 'replace') {
+        if (!confirm('PERINGATAN: Mode "Timpa Semua" akan menghapus seluruh data feedback yang ada di database saat ini dan menggantinya dengan isi berkas. Lanjutkan?')) {
+          return;
+        }
+      }
+
+      if (importSubmitBtn) {
+        importSubmitBtn.disabled = true;
+        importSubmitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-xs"></i><span>Memproses Impor...</span>';
+      }
+
+      try {
+        const token = getAdminToken();
+        const res = await fetch('/api/admin/feedback/import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            mode,
+            raw: selectedFileContent,
+            format: selectedFileFormat
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Gagal memproses impor data.');
+        }
+
+        showImportAlert(data.message || 'Data berhasil diimpor!', true);
+        loadFeedbacks();
+
+        setTimeout(() => {
+          closeImportModal();
+        }, 1800);
+
+      } catch (err) {
+        console.error('Import error:', err);
+        showImportAlert(err.message || 'Terjadi kesalahan sistem saat mengimpor data.', false);
+      } finally {
+        if (importSubmitBtn) {
+          importSubmitBtn.disabled = false;
+          importSubmitBtn.innerHTML = '<i class="fa-solid fa-file-import text-xs"></i><span>Proses Impor</span>';
+        }
+      }
     }
 
     function escapeHtml(text) {

@@ -7,3 +7,5 @@ data/
 .env
 *.log
 .DS_Store
+PANDUAN_BIAYA_DAN_KUOTA.md
+*PANDUAN*.md
